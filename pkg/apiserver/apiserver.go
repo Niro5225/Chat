@@ -2,7 +2,9 @@ package apiserver
 
 import (
 	"chat/pkg/store"
+	"log"
 	"net/http"
+	"text/template"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -13,13 +15,22 @@ type Api_server struct {
 	logger *logrus.Logger
 	router *mux.Router
 	store  *store.Store
+	tpl    *template.Template
 }
 
 func New(conf *Config) Api_server {
+	var err error
+	var tpl *template.Template
+	tpl, err = template.ParseGlob("pkg\\web\\*.gohtml")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	return Api_server{
 		conf:   conf,
 		logger: logrus.New(),
 		router: mux.NewRouter(),
+		tpl:    tpl,
 	}
 }
 
@@ -51,7 +62,9 @@ func (a *Api_server) configure_logger() error {
 }
 
 func (a *Api_server) configure_router() {
-	a.router.HandleFunc("/hello", a.handle_hello())
+	a.router.HandleFunc("/ping", a.handle_hello())
+	a.router.HandleFunc("/", a.index())
+	a.router.HandleFunc("/process", a.process())
 }
 
 func (a *Api_server) configure_store() error {

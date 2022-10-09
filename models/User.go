@@ -12,6 +12,10 @@ type User struct {
 	Uncrypted_Password string
 }
 
+func New_ueser(username, password string) *User {
+	return &User{Username: username, Uncrypted_Password: password}
+}
+
 func (u *User) Before_create() error {
 	if len(u.Uncrypted_Password) > 0 {
 		enc, err := encryption_password(u.Uncrypted_Password)
