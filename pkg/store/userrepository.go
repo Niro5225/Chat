@@ -1,10 +1,20 @@
 package store
 
-import "chat/models"
+import (
+	"chat/models"
+	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
+)
 
 type User_repository struct {
 	store *Store
 }
+
+const (
+	token_ttl = int64(12 * time.Hour)
+	token_key = "sdafAF#fasd#fdfsdcvbbthrhj#dsasda"
+)
 
 func (r *User_repository) Create(u *models.User) (*models.User, error) {
 
@@ -24,6 +34,32 @@ func (r *User_repository) Create(u *models.User) (*models.User, error) {
 	}
 
 	return u, nil
+}
+
+func (r *User_repository) Login(u *models.User) (*models.User, error) {
+	t, err := generate_token(u)
+	if err != nil {
+		return nil, err
+	}
+
+	u.Token = t
+
+	return u, nil
+}
+
+type Token_claims struct {
+	jwt.StandardClaims
+	UserId int `json:"user_id"`
+}
+
+func generate_token(u *models.User) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Token_claims{
+		jwt.StandardClaims{
+			ExpiresAt: token_ttl,
+		}, u.Id,
+	})
+
+	return token.SignedString([]byte(token_key))
 }
 
 func (r *User_repository) Find_by_username(username string) (*models.User, error) {

@@ -10,6 +10,7 @@ type User struct {
 	Username           string `json:"username" binding:"required"`
 	Encrypted_Password string `json:"password" binding:"required"`
 	Uncrypted_Password string
+	Token              string
 }
 
 func New_ueser(username, password string) *User {
