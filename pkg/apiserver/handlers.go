@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"chat/models"
 	"io"
 	"net/http"
 )
@@ -29,27 +30,27 @@ func (a *Api_server) process() http.HandlerFunc {
 		a.logger.Info(username, " ", password)
 
 		//LOGIN
-		u, err := a.store.User().Find_by_username(username)
-		if err != nil {
-			a.logger.Error(err.Error())
-		}
-
-		a.logger.Info(u)
-
-		u, err = a.store.User().Login(u)
-		if err != nil {
-			a.logger.Error(err.Error())
-			return
-		}
-		io.WriteString(w, u.Token)
-
-		//REG
-		// u, err := a.store.User().Create(models.New_ueser(username, password))
+		// u, err := a.store.User().Find_by_username(username)
 		// if err != nil {
 		// 	a.logger.Error(err.Error())
 		// }
 
 		// a.logger.Info(u)
+
+		// u, err = a.store.User().Login(u)
+		// if err != nil {
+		// 	a.logger.Error(err.Error())
+		// 	return
+		// }
+		// io.WriteString(w, u.Token)
+
+		//REG
+		u, err := a.store.User().Create(models.New_ueser(username, password))
+		if err != nil {
+			a.logger.Error(err.Error())
+		}
+
+		a.logger.Info(u)
 
 		return
 
