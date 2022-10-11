@@ -21,6 +21,7 @@ type Api_server struct {
 func New(conf *Config) Api_server {
 	var err error
 	var tpl *template.Template
+	//Считывание всех gohtml файлов
 	tpl, err = template.ParseGlob("pkg\\web\\*.gohtml")
 	if err != nil {
 		log.Fatalln(err)
@@ -28,19 +29,23 @@ func New(conf *Config) Api_server {
 
 	return Api_server{
 		conf:   conf,
-		logger: logrus.New(),
-		router: mux.NewRouter(),
+		logger: logrus.New(),    //Инициализация логера
+		router: mux.NewRouter(), //Инициализация роутера
 		tpl:    tpl,
 	}
 }
 
+//Запуск сервера
 func (a *Api_server) Start() error {
+	//Настройка логера
 	if err := a.configure_logger(); err != nil {
 		return err
 	}
 
+	//Добавление Handle методов
 	a.configure_router()
 
+	//Настройка хранилища
 	if err := a.configure_store(); err != nil {
 		return err
 	}

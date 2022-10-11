@@ -7,7 +7,10 @@ import (
 )
 
 func main() {
+	//Создание конфига лдя сервера
 	conf := apiserver.New_config()
+
+	//Создание обьекта сервера
 	s := apiserver.New(conf)
 
 	if err := s.Start(); err != nil {

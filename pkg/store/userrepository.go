@@ -16,6 +16,7 @@ const (
 	token_key = "sdafAF#fasd#fdfsdcvbbthrhj#dsasda"
 )
 
+//Метод создания пользователя
 func (r *User_repository) Create(u *models.User) (*models.User, error) {
 
 	if err := u.Validate(); err != nil {
@@ -36,7 +37,9 @@ func (r *User_repository) Create(u *models.User) (*models.User, error) {
 	return u, nil
 }
 
+//Метод логина
 func (r *User_repository) Login(u *models.User) (*models.User, error) {
+	//генерация токена
 	t, err := generate_token(u)
 	if err != nil {
 		return nil, err
@@ -47,11 +50,13 @@ func (r *User_repository) Login(u *models.User) (*models.User, error) {
 	return u, nil
 }
 
+//Дополнение стандартных полей для создания токена
 type Token_claims struct {
 	jwt.StandardClaims
 	UserId int `json:"user_id"`
 }
 
+//Метод генерации токена
 func generate_token(u *models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Token_claims{
 		jwt.StandardClaims{
@@ -62,6 +67,7 @@ func generate_token(u *models.User) (string, error) {
 	return token.SignedString([]byte(token_key))
 }
 
+//Метод поиска пользователя по имени пользователя
 func (r *User_repository) Find_by_username(username string) (*models.User, error) {
 	u := &models.User{}
 	if err := r.store.db.QueryRow(

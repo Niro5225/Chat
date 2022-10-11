@@ -35,6 +35,7 @@ func (s *Store) Close() {
 	s.db.Close()
 }
 
+//Метод для исполизования userreposirory из хранилища
 func (s *Store) User() *User_repository {
 	if s.user_repository != nil {
 		return s.user_repository
