@@ -47,14 +47,12 @@ func Test_userrepository_Generate_token(t *testing.T) {
 	s, teardown := store.Test_store(t, db_URL)
 	defer teardown("users")
 
-	username := "test_user"
-
-	u, err := s.User().Create(models.New_ueser(username, "test_user"))
+	u, err := s.User().Create(models.Test_user(t))
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
 	u, terr := s.User().Login(u)
 	assert.NoError(t, terr)
-	assert.NotNil(t, u.Token)
+	assert.NotEmpty(t, u.Token)
 
 }

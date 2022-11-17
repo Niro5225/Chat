@@ -70,6 +70,7 @@ func (a *Api_server) configure_router() {
 	a.router.HandleFunc("/ping", a.handle_hello())
 	a.router.HandleFunc("/", a.index())
 	a.router.HandleFunc("/process", a.process())
+	a.router.HandleFunc("/get_id", a.get_id())
 }
 
 func (a *Api_server) configure_store() error {

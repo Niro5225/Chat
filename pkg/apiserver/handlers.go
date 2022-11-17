@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"chat/models"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -54,5 +55,28 @@ func (a *Api_server) process() http.HandlerFunc {
 
 		return
 
+	}
+}
+
+func (a *Api_server) get_id() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
+		username := r.FormValue("Login")
+		password := r.FormValue("Password")
+
+		u, err := a.store.User().Find_by_username(username)
+		if err != nil {
+			a.logger.Error(err.Error())
+		}
+
+		if c, _ := u.Check_password(password); !c {
+			io.WriteString(w, "BAD PASSWORD")
+		}
+
+		io.WriteString(w, fmt.Sprintf("PASSWORD IS OK ID IS %d", u.Id))
 	}
 }
