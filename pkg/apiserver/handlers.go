@@ -19,34 +19,51 @@ func (a *Api_server) index() http.HandlerFunc {
 	}
 }
 
-func (a *Api_server) process() http.HandlerFunc {
+func (a *Api_server) registration() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		a.tpl.ExecuteTemplate(w, "registration.gohtml", nil)
+	}
+}
+
+func (a *Api_server) login() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		a.tpl.ExecuteTemplate(w, "login.gohtml", nil)
+	}
+}
+
+func (a *Api_server) login_process() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		//LOGIN
+		Email := r.FormValue("Email")
+		u, err := a.store.User().Find_by_email(Email)
+		if err != nil {
+			a.logger.Error(err.Error())
+		}
+
+		a.logger.Info(u)
+
+		_, err = a.store.User().Login(u)
+		if err != nil {
+			io.WriteString(w, string(http.StatusBadRequest))
+			a.logger.Error(err.Error())
+			return
+		}
+
+	}
+}
+
+func (a *Api_server) registration_process() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
-		username := r.FormValue("Login")
-		password := r.FormValue("Password")
-		a.logger.Info(username, " ", password)
-
-		//LOGIN
-		// u, err := a.store.User().Find_by_username(username)
-		// if err != nil {
-		// 	a.logger.Error(err.Error())
-		// }
-
-		// a.logger.Info(u)
-
-		// u, err = a.store.User().Login(u)
-		// if err != nil {
-		// 	a.logger.Error(err.Error())
-		// 	return
-		// }
-		// io.WriteString(w, u.Token)
-
+		FirstName := r.FormValue("FirstName")
+		LastName := r.FormValue("LastName")
+		Email := r.FormValue("Email")
 		//REG
-		u, err := a.store.User().Create(models.New_ueser(username, password))
+		u, err := a.store.User().Create(models.New_ueser(FirstName, LastName, Email))
 		if err != nil {
 			a.logger.Error(err.Error())
 		}
@@ -58,25 +75,13 @@ func (a *Api_server) process() http.HandlerFunc {
 	}
 }
 
-func (a *Api_server) get_id() http.HandlerFunc {
+func (a *Api_server) find_email() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-
-		username := r.FormValue("Login")
-		password := r.FormValue("Password")
-
-		u, err := a.store.User().Find_by_username(username)
+		email := ""
+		fmt.Scanln(&email)
+		_, err := a.store.User().Find_by_email(email)
 		if err != nil {
-			a.logger.Error(err.Error())
+			a.logger.Error(err)
 		}
-
-		if c, _ := u.Check_password(password); !c {
-			io.WriteString(w, "BAD PASSWORD")
-		}
-
-		io.WriteString(w, fmt.Sprintf("PASSWORD IS OK ID IS %d", u.Id))
 	}
 }

@@ -3,30 +3,33 @@ package models
 import (
 	"crypto/sha1"
 	"fmt"
+	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 type User struct {
-	Id                 int    `json:"-" db:"id"`
-	Username           string `json:"username" binding:"required"`
-	Encrypted_Password string `json:"password" binding:"required"`
-	Uncrypted_Password string
-	Token              string
+	ID        uint64
+	FirstName string
+	LastName  string
+	Email     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
-func New_ueser(username, password string) *User {
-	return &User{Username: username, Uncrypted_Password: password}
+func New_ueser(FirstName, LastName, Email string) *User {
+	createTime := time.Now()
+	return &User{FirstName: FirstName, LastName: LastName, Email: Email, CreatedAt: createTime}
 }
 
-func (u *User) Before_create() error {
-	if len(u.Uncrypted_Password) > 0 {
-		enc := encryption_password(u.Uncrypted_Password)
-		u.Encrypted_Password = enc
-	}
+// func (u *User) Before_create() error {
+// 	if len(u.Uncrypted_Password) > 0 {
+// 		enc := encryption_password(u.Uncrypted_Password)
+// 		u.Encrypted_Password = enc
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // func encryption_password(password string) (string, error) {
 // 	e, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
@@ -48,18 +51,9 @@ func encryption_password(password string) string {
 func (u *User) Validate() error {
 	return validation.ValidateStruct(
 		u,
-		validation.Field(&u.Uncrypted_Password, validation.By(requiredIf(u.Encrypted_Password == "")), validation.Length(8, 100)),
-		validation.Field(&u.Username, validation.Required, validation.Length(3, 150)))
-}
+		validation.Field(&u.FirstName, validation.Required, validation.Length(3, 150)),
+		validation.Field(&u.LastName, validation.Required, validation.Length(3, 150)),
+		//ADD email validate
+	)
 
-func (u *User) Check_password(password string) (bool, error) {
-	e_pass := encryption_password(password)
-	fmt.Println(e_pass)
-	fmt.Println(u.Encrypted_Password)
-
-	if e_pass == u.Encrypted_Password {
-		return true, nil
-	} else {
-		return false, nil
-	}
 }

@@ -1,10 +1,15 @@
 package models
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func Test_user(t *testing.T) *User {
 	return &User{
-		Username:           "test_username",
-		Uncrypted_Password: "12345678",
+		FirstName: "testFirstName",
+		LastName:  "testLastName",
+		Email:     "test@email.com",
+		CreatedAt: time.Now(),
 	}
 }

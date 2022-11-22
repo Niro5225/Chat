@@ -69,8 +69,11 @@ func (a *Api_server) configure_logger() error {
 func (a *Api_server) configure_router() {
 	a.router.HandleFunc("/ping", a.handle_hello())
 	a.router.HandleFunc("/", a.index())
-	a.router.HandleFunc("/process", a.process())
-	a.router.HandleFunc("/get_id", a.get_id())
+	a.router.HandleFunc("/registration", a.registration())
+	a.router.HandleFunc("/registration_process", a.registration_process())
+	a.router.HandleFunc("/login", a.login())
+	a.router.HandleFunc("/login_process", a.login_process())
+	a.router.HandleFunc("/find_email", a.find_email())
 }
 
 func (a *Api_server) configure_store() error {

@@ -28,31 +28,17 @@ func Test_userrepository_Find(t *testing.T) {
 	s, teardown := store.Test_store(t, db_URL)
 	defer teardown("users")
 
-	username := "test"
-	_, err := s.User().Find_by_username(username)
+	username := "test@email.com"
+	_, err := s.User().Find_by_email(username)
 	assert.Error(t, err)
 
 	u := models.Test_user(t)
-	u.Username = username
+	u.FirstName = username
 
 	s.User().Create(u)
 
-	u, err = s.User().Find_by_username(username)
+	u, err = s.User().Find_by_email(username)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
-
-}
-
-func Test_userrepository_Generate_token(t *testing.T) {
-	s, teardown := store.Test_store(t, db_URL)
-	defer teardown("users")
-
-	u, err := s.User().Create(models.Test_user(t))
-	assert.NoError(t, err)
-	assert.NotNil(t, u)
-
-	u, terr := s.User().Login(u)
-	assert.NoError(t, terr)
-	assert.NotEmpty(t, u.Token)
 
 }

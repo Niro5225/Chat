@@ -23,13 +23,13 @@ func (r *User_repository) Create(u *models.User) (*models.User, error) {
 		return nil, err
 	}
 
-	if err := u.Before_create(); err != nil {
-		return nil, err
-	}
+	// if err := u.Before_create(); err != nil {
+	// 	return nil, err
+	// }
 
 	err := r.store.db.QueryRow(
-		"INSERT INTO users (username,password_hash) VALUES ($1, $2) RETURNING id", u.Username, u.Encrypted_Password,
-	).Scan(&u.Id)
+		"INSERT INTO users (first_name,last_name,email,created_at) VALUES ($1, $2,$3,$4) RETURNING id", u.FirstName, u.LastName, u.Email, u.CreatedAt,
+	).Scan(&u.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -40,12 +40,12 @@ func (r *User_repository) Create(u *models.User) (*models.User, error) {
 //Метод логина
 func (r *User_repository) Login(u *models.User) (*models.User, error) {
 	//генерация токена
-	t, err := generate_token(u)
+	_, err := generate_token(u)
 	if err != nil {
 		return nil, err
 	}
 
-	u.Token = t
+	// u.Token = t
 
 	return u, nil
 }
@@ -61,20 +61,19 @@ func generate_token(u *models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Token_claims{
 		jwt.StandardClaims{
 			ExpiresAt: token_ttl,
-		}, u.Id,
+		}, int(u.ID),
 	})
 
 	return token.SignedString([]byte(token_key))
 }
 
 //Метод поиска пользователя по имени пользователя
-func (r *User_repository) Find_by_username(username string) (*models.User, error) {
+func (r *User_repository) Find_by_email(email string) (*models.User, error) {
 	u := &models.User{}
 	if err := r.store.db.QueryRow(
-		"SELECT id, username, password_hash FROM users WHERE username = $1", username,
-	).Scan(&u.Id, &u.Username, &u.Encrypted_Password); err != nil {
+		"SELECT id,first_name,last_name FROM users WHERE email = $1", email,
+	).Scan(&u.ID, &u.FirstName, &u.LastName); err != nil {
 		return nil, err
 	}
-
 	return u, nil
 }
