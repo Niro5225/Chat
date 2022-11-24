@@ -1,20 +1,18 @@
 package models
 
 import (
-	"crypto/sha1"
-	"fmt"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 type User struct {
-	ID        uint64
-	FirstName string
-	LastName  string
-	Email     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uint64    `db:"id"`
+	FirstName string    `db:"first_name"`
+	LastName  string    `db:"last_name"`
+	Email     string    `db:"email"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 func New_ueser(FirstName, LastName, Email string) *User {
@@ -39,14 +37,6 @@ func New_ueser(FirstName, LastName, Email string) *User {
 
 // 	return string(e), nil
 // }
-
-func encryption_password(password string) string {
-	salt := "njsankdmbdlekkgo"
-	hash := sha1.New()
-	hash.Write([]byte(password))
-
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
-}
 
 func (u *User) Validate() error {
 	return validation.ValidateStruct(

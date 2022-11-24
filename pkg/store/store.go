@@ -6,9 +6,11 @@ import (
 )
 
 type Store struct {
-	conf            *Config
-	db              *sqlx.DB
-	user_repository *User_repository
+	conf              *Config
+	db                *sqlx.DB
+	user_repository   *User_repository
+	chatRepository    *ChatRepository
+	messageReposirory *MessageRepository
 }
 
 func New(conf *Config) *Store {
@@ -46,4 +48,28 @@ func (s *Store) User() *User_repository {
 	}
 
 	return s.user_repository
+}
+
+func (s *Store) Chat() *ChatRepository {
+	if s.user_repository != nil {
+		return s.chatRepository
+	}
+
+	s.chatRepository = &ChatRepository{
+		store: s,
+	}
+
+	return s.chatRepository
+}
+
+func (s *Store) Message() *MessageRepository {
+	if s.messageReposirory != nil {
+		return s.messageReposirory
+	}
+
+	s.messageReposirory = &MessageRepository{
+		store: s,
+	}
+
+	return s.messageReposirory
 }

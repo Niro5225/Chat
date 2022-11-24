@@ -10,3 +10,7 @@ type Message struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func NewMessage(Text string, chatId, userId uint64, creatTime time.Time) *Message {
+	return &Message{Text: Text, ChatID: chatId, CreatedBy: userId, CreatedAt: creatTime}
+}

@@ -70,10 +70,14 @@ func (a *Api_server) configure_router() {
 	a.router.HandleFunc("/ping", a.handle_hello())
 	a.router.HandleFunc("/", a.index())
 	a.router.HandleFunc("/registration", a.registration())
-	a.router.HandleFunc("/registration_process", a.registration_process())
+	a.router.HandleFunc("/registration_process", a.RegistrationProcess())
 	a.router.HandleFunc("/login", a.login())
-	a.router.HandleFunc("/login_process", a.login_process())
-	a.router.HandleFunc("/find_email", a.find_email())
+	a.router.HandleFunc("/login_process", a.loginProcess())
+	a.router.HandleFunc("/find_email", a.FindEmail())
+	a.router.HandleFunc("/create_chat", a.CreateChat())
+	a.router.HandleFunc("/chat_create_process", a.CreateChatProcess())
+	a.router.HandleFunc("/open_chat", a.OpenChat())
+	a.router.HandleFunc("/message_process", a.MessageProcess())
 }
 
 func (a *Api_server) configure_store() error {

@@ -37,7 +37,7 @@ CREATE TABLE chats
     id serial NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
-    created_by TEXT NOT NULL,
+    created_by INTEGER NOT NULL,
     created_at TIME NOT NULL,
     updated_at TIME
 
