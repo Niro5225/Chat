@@ -1,19 +1,32 @@
 package main
 
 import (
-	"chat/pkg/apiserver"
+	"chat-app/internal/config"
+	"chat-app/internal/handlers"
+	"chat-app/internal/repository"
+	"chat-app/internal/server"
+	"chat-app/internal/service"
 
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	//Создание конфига лдя сервера
-	conf := apiserver.New_config()
+	cfg := config.New_config()
 
-	//Создание обьекта сервера
-	s := apiserver.New(conf)
+	db, err := repository.NewDB(*cfg.DB)
+	if err != nil {
+		logrus.Fatal(err)
+	}
 
-	if err := s.Start(); err != nil {
+	repos := repository.NewRepository(db)
+	services := service.NewServices(repos)
+
+	router := handlers.NewRouter(services)
+
+	serv := server.NewApiServer(cfg, logrus.New(), router)
+
+	if err := serv.Start(); err != nil {
 		logrus.Fatal(err.Error())
 	}
+
 }

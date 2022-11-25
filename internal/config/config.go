@@ -1,7 +1,7 @@
-package apiserver
+package config
 
 import (
-	"chat/pkg/store"
+	"chat-app/internal/repository"
 	"fmt"
 	"os"
 
@@ -10,9 +10,9 @@ import (
 )
 
 type Config struct {
-	bind      string
-	log_level string
-	Store     *store.Config
+	Bind      string
+	Log_level string
+	DB        *repository.Config
 }
 
 func New_config() *Config {
@@ -23,8 +23,8 @@ func New_config() *Config {
 	log_l := os.Getenv("LOGLEVEL")
 	b := fmt.Sprintf("%s:%s", os.Getenv("SERVERHOST"), os.Getenv("SERVERPORT"))
 	return &Config{
-		log_level: log_l,
-		bind:      b,
-		Store:     store.New_config(),
+		Log_level: log_l,
+		Bind:      b,
+		DB:        repository.New_config(),
 	}
 }
