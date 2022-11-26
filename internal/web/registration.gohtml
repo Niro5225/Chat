@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="styles/login_page_style.css"> -->
+    <style>
+        div{
+            display: table;
+            margin-right: auto;
+            margin-left: auto;
+            /* background-color: gray; */
+            margin-top: auto;
+            width: 300px;
+            height: 300px;
+        }
+
+        input{
+        content: unset;
+        width: 150px;
+        height: 30px;
+        margin: 3px;
+        margin-left: auto; margin-right: auto;
+        margin-top: auto; margin-bottom: auto;
+        border-radius: 7px;
+        }
+
+        button{
+            content: unset;
+            height: 30px;
+            width: auto;
+            margin: 3px;
+        }
+    </style>
+    <title>registration</title>
+    <link>
+</head>
+<body>
+    <div id="log" name="log_div">
+        <form action="/registration_process" method="POST">
+            <input id="FirstName" name="FirstName" type="text" placeholder="FirstName"><br>
+            <input id="LastName" name="LastName" type="text" placeholder="LastName"><br>
+            <input id="Email" name="Email" type="text" placeholder="Email"><br>
+            <input id="password" name="password" type="password" placeholder="Enter password"><br>
+            <button id="Reg_but" name="Reg_but">Регистрация</button>
+        </form>
+    </div>
+
+
+
+    
+</body>
+</html>

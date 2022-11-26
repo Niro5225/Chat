@@ -4,7 +4,7 @@ CREATE TABLE users
     first_name text not null,
     last_name text not null,
     email text not null unique,
-    created_at time not NULL,
+    created_at time,
     updated_at time
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE messages
     message_text TEXT NOT NULL,
     chat_id INTEGER NOT NULL,
     created_by INTEGER NOT NULL,
-    created_at TIME NOT NULL,
+    created_at TIME,
     updated_at TIME
 );
 

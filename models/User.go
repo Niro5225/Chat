@@ -15,7 +15,7 @@ type User struct {
 	UpdatedAt time.Time `db:"updated_at"`
 }
 
-func New_ueser(FirstName, LastName, Email string) *User {
+func NewUser(FirstName, LastName, Email string) *User {
 	createTime := time.Now()
 	return &User{FirstName: FirstName, LastName: LastName, Email: Email, CreatedAt: createTime}
 }
@@ -38,7 +38,7 @@ func New_ueser(FirstName, LastName, Email string) *User {
 // 	return string(e), nil
 // }
 
-func (u *User) Validate() error {
+func (u *User) ValidateUser() error {
 	return validation.ValidateStruct(
 		u,
 		validation.Field(&u.FirstName, validation.Required, validation.Length(3, 150)),
