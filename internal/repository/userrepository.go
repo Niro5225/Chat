@@ -69,7 +69,7 @@ func (r *UserR) CreateUserCredential(credential models.UserCredential) (*models.
 }
 
 func (r *UserR) UpdateUserCredential(credential models.UserCredential) (*models.UserCredential, error) {
-	row := r.db.QueryRow("UPDATE user_credential SET email=&2,password=$3 WHERE id = $1",
+	row := r.db.QueryRow("UPDATE user_credential SET email=$2,password=$3 WHERE id = $1",
 		credential.ID, credential.Email, credential.Password)
 
 	if row.Err() != nil {

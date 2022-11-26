@@ -30,6 +30,7 @@ func NewRouter(services *service.Services) *Router {
 func (r *Router) Configure_router() {
 	r.Router.HandleFunc("/ping", r.ping())
 	r.Router.HandleFunc("/test", r.test())
+	r.Router.HandleFunc("/testS", r.test1())
 }
 
 func (router *Router) ping() http.HandlerFunc {
@@ -48,6 +49,28 @@ func (router *Router) test() http.HandlerFunc {
 		userCredential := models.NewUserCredential(u.ID, "testpassword", u.Email)
 
 		userCredential, err = router.services.UserRepository.CreateUserCredential(*userCredential)
+		if err != nil {
+			io.WriteString(w, err.Error())
+		}
+	}
+}
+
+func (router *Router) test1() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		u, err := router.services.UserRepository.GetUser(1)
+		if err != nil {
+			io.WriteString(w, err.Error())
+		}
+
+		u.Email = "111111111111"
+		u, err = router.services.UpdateUser(*u)
+		if err != nil {
+			io.WriteString(w, err.Error())
+		}
+
+		userCredential := models.NewUserCredential(u.ID, "testpassword", u.Email)
+
+		userCredential, err = router.services.UserRepository.UpdateUserCredential(*userCredential)
 		if err != nil {
 			io.WriteString(w, err.Error())
 		}

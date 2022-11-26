@@ -2,6 +2,7 @@ package models
 
 import (
 	"crypto/sha1"
+	"fmt"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -21,7 +22,7 @@ func (uc *UserCredential) Encryption_password() {
 	hash := sha1.New()
 	hash.Write([]byte(uc.Password))
 
-	uc.Password = string(hash.Sum([]byte(salt)))
+	uc.Password = fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 
 }
 
