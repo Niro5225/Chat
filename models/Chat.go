@@ -6,12 +6,12 @@ type Chat struct {
 	ID          uint64
 	Name        string
 	Description string
-	CreatedBy   int
+	CreatedBy   uint64
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
-func NewChat(name, descr string, id int, createTime time.Time) *Chat {
+func NewChat(name, descr string, id uint64, createTime time.Time) *Chat {
 	return &Chat{Name: name, Description: descr, CreatedBy: id, CreatedAt: createTime}
 }
 

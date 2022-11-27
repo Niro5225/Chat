@@ -16,8 +16,8 @@ var (
 	TestUser = models.NewUser("test", "test", "testemail")
 )
 
-func truncTable() {
-	if _, err := db.Exec(fmt.Sprintf("TRUNCATE users CASCADE")); err != nil {
+func truncTable(table string) {
+	if _, err := db.Exec(fmt.Sprintf(fmt.Sprintf("TRUNCATE %s CASCADE", table))); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -30,11 +30,10 @@ func TestUserR_CreateUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 
-	truncTable()
+	truncTable("users")
 }
 
 func TestUserR_GetUser(t *testing.T) {
-	// defer db.Close()
 
 	u, _ := r.CreateUser(*TestUser)
 
@@ -43,30 +42,24 @@ func TestUserR_GetUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 
-	truncTable()
+	truncTable("users")
 }
 
 func TestUserR_UpdateUser(t *testing.T) {
-	// defer db.Close()
 
 	u, _ := r.CreateUser(*TestUser)
 
-	fmt.Println(u)
-
 	u.FirstName = "firstname"
-
-	fmt.Println(u)
 
 	newUser, err := r.UpdateUser(*u)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, newUser)
 
-	truncTable()
+	truncTable("users")
 }
 
 func TestDeleteUser(t *testing.T) {
-	// defer db.Close()
 	u, _ := r.CreateUser(*TestUser)
 
 	err := r.DeleteUser(u.ID)
@@ -75,7 +68,6 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestCreateUserCredential(t *testing.T) {
-	// defer db.Close()
 
 	u, _ := r.CreateUser(*TestUser)
 
@@ -83,11 +75,9 @@ func TestCreateUserCredential(t *testing.T) {
 
 	userCredential1, err := r.CreateUserCredential(*userCredential)
 
-	fmt.Println(userCredential)
-
 	assert.NoError(t, err)
 	assert.NotNil(t, userCredential1)
-	truncTable()
+	truncTable("users")
 
 }
 
@@ -97,8 +87,6 @@ func TestUpdateUserCredential(t *testing.T) {
 	userCredential := models.NewUserCredential(u.ID, "testpassword", u.Email)
 
 	userCredential, err = r.CreateUserCredential(*userCredential)
-
-	fmt.Println(userCredential)
 
 	newUser, err := r.GetUser(u.ID)
 	if err != nil {
@@ -112,8 +100,6 @@ func TestUpdateUserCredential(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(newUser)
-
 	newCred := models.NewUserCredential(newUser.ID, "testpassword", newUser.Email)
 	newCred.Encryption_password()
 	newCred, err = r.UpdateUserCredential(*newCred)
@@ -121,5 +107,5 @@ func TestUpdateUserCredential(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, newCred)
 
-	truncTable()
+	truncTable("users")
 }

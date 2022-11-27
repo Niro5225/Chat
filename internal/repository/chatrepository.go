@@ -29,18 +29,18 @@ func (r *ChatR) CreateChat(chat models.Chat) (*models.Chat, error) {
 }
 
 func (r *ChatR) GetChat(id uint64) (*models.Chat, error) {
-	var chat *models.Chat
+	var chat models.Chat
 	if err := r.db.QueryRow(
-		"SELECT chat_name,chat_description,created_by,created_at,updated_at FROM chats WHERE id = $1", id,
-	).Scan(&chat.Name, &chat.Description, &chat.CreatedBy, &chat, chat.CreatedAt, &chat.UpdatedAt); err != nil {
+		"SELECT chat_name,chat_description,created_by,created_at FROM chats WHERE id = $1", id,
+	).Scan(&chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
 		return nil, err
 	}
-	return chat, nil
+	return &chat, nil
 }
 
 func (r *ChatR) UpdateChat(chat models.Chat) (*models.Chat, error) {
 	row := r.db.QueryRow("UPDATE chats SET chat_name = $2, chat_description = $3, created_by=$4, updated_at=$5 WHERE id = $1",
-		chat.Name, chat.Description, chat.CreatedBy, chat.UpdatedAt)
+		chat.ID, chat.Name, chat.Description, chat.CreatedBy, chat.UpdatedAt)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}

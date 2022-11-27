@@ -16,13 +16,13 @@ func NewMessageR(db *sqlx.DB) *MessageR {
 }
 
 func (r *MessageR) GetMessage(id uint64) (*models.Message, error) {
-	var m *models.Message
+	var m models.Message
 	if err := r.db.QueryRow(
 		"SELECT id,message_text,chat_id,created_by,created_at FROM messages WHERE id = $1", id,
 	).Scan(&m.ID, &m.Text, &m.ChatID, &m.CreatedBy, &m.CreatedAt); err != nil {
 		return nil, err
 	}
-	return m, nil
+	return &m, nil
 }
 
 func (r *MessageR) CreateMessage(message models.Message) (*models.Message, error) {
