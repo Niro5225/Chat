@@ -28,6 +28,10 @@ func (s *UserService) GetUser(id uint64) (*models.User, error) {
 	return s.repo.GetUser(id)
 }
 
+func (s *UserService) GetUsers(userFilter *models.UserFilter) ([]models.User, error) {
+	return s.repo.GetUsers(userFilter)
+}
+
 func (s *UserService) UpdateUser(user models.User) (*models.User, error) {
 	return s.repo.UpdateUser(user)
 }

@@ -48,6 +48,44 @@ func (r *UserR) GetUser(id uint64) (*models.User, error) {
 	return &u, nil
 }
 
+func (r *UserR) GetUsers(userFilter *models.UserFilter) ([]models.User, error) {
+	users := []models.User{}
+	if userFilter != nil {
+		if len(userFilter.IDs) != 0 {
+			for _, id := range userFilter.IDs {
+				var u models.User
+				if err := r.db.QueryRow(
+					"SELECT first_name,last_name,email FROM users WHERE id = $1", id,
+				).Scan(&u.FirstName, &u.LastName, &u.Email); err != nil {
+					return nil, err
+				}
+				users = append(users, u)
+			}
+		} else if userFilter.Email != nil {
+			var u models.User
+			if err := r.db.QueryRow(
+				"SELECT id,first_name,last_name,email FROM users WHERE email = $1", userFilter.Email,
+			).Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email); err != nil {
+				return nil, err
+			}
+		} else if userFilter.Search != nil {
+
+			rows, err := r.db.Queryx("SELECT * FROM users WHERE first_name=$1 OR last_name=$1", userFilter.Search)
+			if err != nil {
+				return nil, err
+			}
+			for rows.Next() {
+				var u models.User
+				err = rows.StructScan(&u)
+				users = append(users, u)
+			}
+		}
+	} else {
+		return nil, nil
+	}
+	return users, nil
+}
+
 func (r *UserR) UpdateUser(user models.User) (*models.User, error) {
 	row := r.db.QueryRow("UPDATE users SET first_name = $2, last_name = $3, email=$4,updated_at=$5 WHERE id = $1",
 		user.ID, user.FirstName, user.LastName, user.Email, time.Now())

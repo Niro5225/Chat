@@ -42,6 +42,84 @@ func TestGetMessage(t *testing.T) {
 	truncTable("messages")
 }
 
+func TestGetMessagesByIDs(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+
+	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message1, _ := messageR.CreateMessage(*models.NewMessage("test text1", chat.ID, u.ID, time.Now()))
+	message2, _ := messageR.CreateMessage(*models.NewMessage("test text2", chat.ID, u.ID, time.Now()))
+
+	filter := models.MessageFilter{IDs: []uint64{message.ID, message1.ID, message2.ID}}
+
+	GetMessages, err := messageR.GetMessages(&filter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, GetMessages)
+
+	truncTable("users")
+	truncTable("chats")
+	truncTable("messages")
+}
+
+func TestGetMessagesBySearch(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+
+	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+
+	filter := models.MessageFilter{Search: &message.Text}
+
+	GetMessages, err := messageR.GetMessages(&filter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, GetMessages)
+
+	truncTable("users")
+	truncTable("chats")
+	truncTable("messages")
+}
+
+func TestGetMessagesByChatIDs(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+
+	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message1, _ := messageR.CreateMessage(*models.NewMessage("test text1", chat.ID, u.ID, time.Now()))
+	message2, _ := messageR.CreateMessage(*models.NewMessage("test text2", chat.ID, u.ID, time.Now()))
+
+	filter := models.MessageFilter{ChatIDs: []uint64{message.ChatID, message1.ChatID, message2.ChatID}}
+
+	GetMessages, err := messageR.GetMessages(&filter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, GetMessages)
+
+	truncTable("users")
+	truncTable("chats")
+	truncTable("messages")
+}
+
+func TestGetMessagesByUserIDs(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+
+	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message1, _ := messageR.CreateMessage(*models.NewMessage("test text1", chat.ID, u.ID, time.Now()))
+	message2, _ := messageR.CreateMessage(*models.NewMessage("test text2", chat.ID, u.ID, time.Now()))
+
+	filter := models.MessageFilter{UserIDs: []uint64{message.CreatedBy, message1.CreatedBy, message2.CreatedBy}}
+
+	GetMessages, err := messageR.GetMessages(&filter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, GetMessages)
+
+	truncTable("users")
+	truncTable("chats")
+	truncTable("messages")
+}
+
 func TestUpdateMessage(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
 	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))

@@ -13,6 +13,10 @@ func (s *MessageService) GetMessage(id uint64) (*models.Message, error) {
 	return s.repo.GetMessage(id)
 }
 
+func (s *MessageService) GetMessages(filter *models.MessageFilter) ([]models.Message, error) {
+	return s.repo.GetMessages(filter)
+}
+
 func (s *MessageService) CreateMessage(chat models.Message) (*models.Message, error) {
 	return s.repo.CreateMessage(chat)
 }
@@ -25,12 +29,12 @@ func (s *MessageService) DeleteMessage(id uint64) error {
 	return s.repo.DeleteMessage(id)
 }
 
-// func (s *MessageService) CreateUserMessages(userMessage []models.UserMessage) (*models.UserMessage, error) {
-// 	return s.repo.CreateUserMessages(userMessage)
-// }
+func (s *MessageService) CreateUserMessages(userMessage []models.UserMessage) error {
+	return s.repo.CreateUserMessages(userMessage)
+}
 
-func (s *MessageService) UpdateUserMessage(chat models.UserMessage) (*models.UserMessage, error) {
-	return s.repo.UpdateUserMessage(chat)
+func (s *MessageService) UpdateUserMessage(userMessage models.UserMessage) (*models.UserMessage, error) {
+	return s.repo.UpdateUserMessage(userMessage)
 }
 
 func (s *MessageService) DeleteUserMessage(userMessage models.UserMessage) error {

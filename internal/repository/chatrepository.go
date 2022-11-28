@@ -38,6 +38,44 @@ func (r *ChatR) GetChat(id uint64) (*models.Chat, error) {
 	return &chat, nil
 }
 
+func (r *ChatR) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
+	var chats []models.Chat
+	if filter != nil {
+		if filter.IDs != nil {
+			for _, id := range filter.IDs {
+				var chat models.Chat
+				if err := r.db.QueryRow(
+					"SELECT id, chat_name,chat_description,created_by,created_at FROM chats WHERE id = $1", id,
+				).Scan(&chat.ID, &chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
+					return nil, err
+				}
+				chats = append(chats, chat)
+			}
+		} else if filter.Search != nil {
+			rows, err := r.db.Queryx("SELECT * FROM chats WHERE chat_name=$1 OR chat_description=$1", filter.Search)
+			if err != nil {
+				return nil, err
+			}
+			for rows.Next() {
+				var chat models.Chat
+				err = rows.StructScan(&chat)
+				chats = append(chats, chat)
+			}
+		} else if filter.UserIDs != nil {
+			for _, id := range filter.UserIDs {
+				var chat models.Chat
+				if err := r.db.QueryRow(
+					"SELECT id, chat_name,chat_description,created_by,created_at FROM chats WHERE created_by = $1", id,
+				).Scan(&chat.ID, &chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
+					return nil, err
+				}
+				chats = append(chats, chat)
+			}
+		}
+	}
+	return chats, nil
+}
+
 func (r *ChatR) UpdateChat(chat models.Chat) (*models.Chat, error) {
 	row := r.db.QueryRow("UPDATE chats SET chat_name = $2, chat_description = $3, created_by=$4, updated_at=$5 WHERE id = $1",
 		chat.ID, chat.Name, chat.Description, chat.CreatedBy, chat.UpdatedAt)

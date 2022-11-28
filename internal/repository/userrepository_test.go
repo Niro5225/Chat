@@ -109,3 +109,37 @@ func TestUpdateUserCredential(t *testing.T) {
 
 	truncTable("users")
 }
+
+func TestGetUsersByIDs(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	u1, _ := r.CreateUser(*models.NewUser("second", "second", "second"))
+	u2, _ := r.CreateUser(*models.NewUser("third", "third", "third"))
+	filter := models.UserFilter{IDs: []uint64{u.ID, u1.ID, u2.ID}}
+	users, err := r.GetUsers(&filter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, users)
+	truncTable("users")
+}
+
+func TestGetUsersByEmail(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	filter := models.UserFilter{Email: &u.Email}
+	users, err := r.GetUsers(&filter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, users)
+
+	truncTable("users")
+}
+
+func TestGetUsersBySearch(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	filter := models.UserFilter{Search: &u.FirstName}
+	users, err := r.GetUsers(&filter)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, users)
+
+	truncTable("users")
+}

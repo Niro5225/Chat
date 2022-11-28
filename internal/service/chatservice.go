@@ -21,6 +21,10 @@ func (s *ChatService) GetChat(id uint64) (*models.Chat, error) {
 	return s.repo.GetChat(id)
 }
 
+func (s *ChatService) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
+	return s.repo.GetChats(filter)
+}
+
 func (s *ChatService) UpdateChat(chat models.Chat) (*models.Chat, error) {
 	return s.repo.UpdateChat(chat)
 }
