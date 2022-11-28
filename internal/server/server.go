@@ -12,7 +12,6 @@ type ApiServer struct {
 	conf   *config.Config
 	logger *logrus.Logger
 	router *handlers.Router
-	// tpl    *template.Template
 }
 
 func NewApiServer(cfg *config.Config, log *logrus.Logger, router *handlers.Router) *ApiServer {
@@ -30,11 +29,6 @@ func (a *ApiServer) Start() error {
 	}
 
 	a.router.Configure_router()
-
-	// //Настройка хранилища
-	// if err := a.configure_store(); err != nil {
-	// 	return err
-	// }
 
 	a.logger.Info("Starting API Server")
 
