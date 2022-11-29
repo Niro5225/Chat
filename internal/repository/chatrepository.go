@@ -72,6 +72,16 @@ func (r *ChatR) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
 				chats = append(chats, chat)
 			}
 		}
+	} else {
+		rows, err := r.db.Queryx("SELECT * FROM chats")
+		if err != nil {
+			return nil, err
+		}
+		for rows.Next() {
+			var chat models.Chat
+			err = rows.StructScan(&chat)
+			chats = append(chats, chat)
+		}
 	}
 	return chats, nil
 }

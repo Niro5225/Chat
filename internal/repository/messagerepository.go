@@ -71,6 +71,15 @@ func (r *MessageR) GetMessages(filter *models.MessageFilter) ([]models.Message, 
 			}
 		}
 	} else {
+		rows, err := r.db.Queryx("SELECT * FROM messages")
+		if err != nil {
+			return nil, err
+		}
+		for rows.Next() {
+			var m models.Message
+			err = rows.StructScan(&m)
+			messages = append(messages, m)
+		}
 
 	}
 	return messages, nil

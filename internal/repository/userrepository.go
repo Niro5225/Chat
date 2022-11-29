@@ -81,7 +81,16 @@ func (r *UserR) GetUsers(userFilter *models.UserFilter) ([]models.User, error) {
 			}
 		}
 	} else {
-		return nil, nil
+
+		rows, err := r.db.Queryx("SELECT * FROM users")
+		if err != nil {
+			return nil, err
+		}
+		for rows.Next() {
+			var u models.User
+			err = rows.StructScan(&u)
+			users = append(users, u)
+		}
 	}
 	return users, nil
 }

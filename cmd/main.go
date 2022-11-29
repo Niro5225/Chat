@@ -11,21 +11,20 @@ import (
 )
 
 func main() {
-	cfg := config.New_config()
+	cfg := config.New_config() //обьект конфига
 
-	db, err := repository.NewDB(*cfg.DB)
+	db, err := repository.NewDB(*cfg.DB) //обьект БД
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	repos := repository.NewRepository(db)
-	services := service.NewServices(repos)
+	repos := repository.NewRepository(db)  //обьект репозитория
+	services := service.NewServices(repos) //обьект сервиса
 
-	router := handlers.NewRouter(services)
+	router := handlers.NewRouter(services)                 //обьект роутера
+	serv := server.NewApiServer(cfg, logrus.New(), router) //обьект сервера
 
-	serv := server.NewApiServer(cfg, logrus.New(), router)
-
-	if err := serv.Start(); err != nil {
+	if err := serv.Start(); err != nil { //запуск сервера
 		logrus.Fatal(err.Error())
 	}
 

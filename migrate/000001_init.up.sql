@@ -8,26 +8,12 @@ CREATE TABLE users
     updated_at time
 );
 
-CREATE TABLE user_message
-(
-    user_id INTEGER not null,
-    message_id INTEGER NOT NULL,
-    is_read BOOLEAN
-);
-
-CREATE TABLE user_credential
-(
-    id serial NOT NULL UNIQUE,
-    email TEXT NOT NULL,
-    password text not null
-);
-
 CREATE TABLE messages
 (
     id serial not null UNIQUE,
     message_text TEXT NOT NULL,
     chat_id INTEGER NOT NULL,
-    created_by INTEGER NOT NULL,
+    created_by INTEGER REFERENCES users(id) on DELETE CASCADE NOT NULL,
     created_at TIME,
     updated_at TIME
 );
@@ -42,3 +28,19 @@ CREATE TABLE chats
     updated_at TIME
 
 );
+
+CREATE TABLE user_message
+(
+    user_id INTEGER REFERENCES users(id) on DELETE CASCADE not null,
+    message_id INTEGER REFERENCES messages(id) on DELETE CASCADE NOT NULL,
+    is_read BOOLEAN
+);
+
+CREATE TABLE user_credential
+(
+    id serial REFERENCES users(id) on DELETE CASCADE NOT NULL UNIQUE,
+    email TEXT NOT NULL,
+    password text not null
+);
+
+
