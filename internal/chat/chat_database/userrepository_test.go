@@ -1,7 +1,8 @@
-package repository
+package chat_database
 
 import (
-	"chat-app/models"
+	"chat-app/internal/config"
+	"chat-app/internal/models"
 	"fmt"
 	"log"
 	"testing"
@@ -10,9 +11,9 @@ import (
 )
 
 var (
-	cfg      = New_config()
+	cfg      = config.New_config()
 	db, err  = NewDB(*cfg)
-	r        = NewUserR(db)
+	r        = NewUserRepoImpl(db)
 	TestUser = models.NewUser("test", "test", "testemail")
 )
 
@@ -78,6 +79,7 @@ func TestCreateUserCredential(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, userCredential1)
 	truncTable("users")
+	truncTable("user_credential")
 
 }
 
@@ -101,13 +103,13 @@ func TestUpdateUserCredential(t *testing.T) {
 	}
 
 	newCred := models.NewUserCredential(newUser.ID, "testpassword", newUser.Email)
-	newCred.Encryption_password()
 	newCred, err = r.UpdateUserCredential(*newCred)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, newCred)
 
 	truncTable("users")
+	truncTable("user_credential")
 }
 
 func TestGetUsersByIDs(t *testing.T) {
@@ -142,4 +144,38 @@ func TestGetUsersBySearch(t *testing.T) {
 	assert.NotNil(t, users)
 
 	truncTable("users")
+}
+
+func TestSignUp(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+
+	userCredential := models.NewUserCredential(u.ID, "testpassword", u.Email)
+
+	userCredential, _ = r.CreateUserCredential(*userCredential)
+
+	signedUser, token, err := r.SignUp(*u, *userCredential)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, signedUser)
+	assert.NotEmpty(t, token)
+
+	truncTable("users")
+	truncTable("user_credential")
+}
+
+func TestSignIn(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+
+	userCredential, _ := r.CreateUserCredential(*models.NewUserCredential(u.ID, "testpassword", u.Email))
+
+	password := "testpassword"
+
+	signedUser, token, err := r.SignIn(userCredential.Email, password)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, signedUser)
+	assert.NotEmpty(t, token)
+
+	truncTable("users")
+	truncTable("user_credential")
 }

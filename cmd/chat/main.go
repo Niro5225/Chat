@@ -1,11 +1,11 @@
 package main
 
 import (
+	"chat-app/internal/api/handlers"
+	"chat-app/internal/api/server"
+	"chat-app/internal/chat/chat_database"
+	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/config"
-	"chat-app/internal/handlers"
-	"chat-app/internal/repository"
-	"chat-app/internal/server"
-	"chat-app/internal/service"
 
 	"github.com/sirupsen/logrus"
 )
@@ -13,13 +13,13 @@ import (
 func main() {
 	cfg := config.New_config() //обьект конфига
 
-	db, err := repository.NewDB(*cfg.DB) //обьект БД
+	db, err := chat_database.NewDB(*cfg) //обьекconfig
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	repos := repository.NewRepository(db)  //обьект репозитория
-	services := service.NewServices(repos) //обьект сервиса
+	repos := chat_domain.NewRepository(db)     //обьект репозитория
+	services := chat_domain.NewServices(repos) //обьект сервиса
 
 	router := handlers.NewRouter(services)                 //обьект роутера
 	serv := server.NewApiServer(cfg, logrus.New(), router) //обьект сервера

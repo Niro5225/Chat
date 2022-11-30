@@ -1,7 +1,7 @@
-package repository
+package chat_database
 
 import (
-	"chat-app/models"
+	"chat-app/internal/models"
 	"testing"
 	"time"
 
@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	chatR = NewChatR(db)
+	chatR = NewChatRepoImpl(db)
 )
 
 func TestCreateChat(t *testing.T) {

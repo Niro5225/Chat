@@ -1,8 +1,8 @@
 package server
 
 import (
+	"chat-app/internal/api/handlers"
 	"chat-app/internal/config"
-	"chat-app/internal/handlers"
 	"net/http"
 
 	"github.com/sirupsen/logrus"

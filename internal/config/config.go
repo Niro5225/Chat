@@ -1,7 +1,6 @@
 package config
 
 import (
-	"chat-app/internal/repository"
 	"fmt"
 	"os"
 
@@ -12,7 +11,7 @@ import (
 type Config struct {
 	Bind      string
 	Log_level string
-	DB        *repository.Config
+	DB        string
 }
 
 func New_config() *Config {
@@ -22,9 +21,11 @@ func New_config() *Config {
 
 	log_l := os.Getenv("LOGLEVEL")
 	b := fmt.Sprintf("%s:%s", os.Getenv("SERVERHOST"), os.Getenv("SERVERPORT"))
+	conn_str := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+		os.Getenv("DBHOST"), os.Getenv("DBPORT"), os.Getenv("DBUSER"), os.Getenv("DBNAME"), os.Getenv("PASSWORD"), os.Getenv("SSLMODE"))
 	return &Config{
 		Log_level: log_l,
 		Bind:      b,
-		DB:        repository.New_config(),
+		DB:        conn_str,
 	}
 }

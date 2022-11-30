@@ -1,21 +1,21 @@
-package repository
+package chat_database
 
 import (
-	"chat-app/models"
+	"chat-app/internal/models"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 )
 
-type MessageR struct {
+type MessageRepoImpl struct {
 	db *sqlx.DB
 }
 
-func NewMessageR(db *sqlx.DB) *MessageR {
-	return &MessageR{db: db}
+func NewMessageRepoImpl(db *sqlx.DB) *MessageRepoImpl {
+	return &MessageRepoImpl{db: db}
 }
 
-func (r *MessageR) GetMessage(id uint64) (*models.Message, error) {
+func (r *MessageRepoImpl) GetMessage(id uint64) (*models.Message, error) {
 	var m models.Message
 	if err := r.db.QueryRow(
 		"SELECT id,message_text,chat_id,created_by,created_at FROM messages WHERE id = $1", id,
@@ -25,7 +25,7 @@ func (r *MessageR) GetMessage(id uint64) (*models.Message, error) {
 	return &m, nil
 }
 
-func (r *MessageR) GetMessages(filter *models.MessageFilter) ([]models.Message, error) {
+func (r *MessageRepoImpl) GetMessages(filter *models.MessageFilter) ([]models.Message, error) {
 	var messages []models.Message
 	if filter != nil {
 		if filter.IDs != nil {
@@ -85,7 +85,7 @@ func (r *MessageR) GetMessages(filter *models.MessageFilter) ([]models.Message, 
 	return messages, nil
 }
 
-func (r *MessageR) CreateMessage(message models.Message) (*models.Message, error) {
+func (r *MessageRepoImpl) CreateMessage(message models.Message) (*models.Message, error) {
 	err := r.db.QueryRow(
 		"INSERT INTO messages (message_text,chat_id,created_by,created_at) VALUES ($1, $2,$3,$4) RETURNING id",
 		message.Text, message.ChatID, message.CreatedBy, message.CreatedAt).Scan(&message.ID)
@@ -97,7 +97,7 @@ func (r *MessageR) CreateMessage(message models.Message) (*models.Message, error
 	return &message, nil
 }
 
-func (r *MessageR) UpdateMessage(message models.Message) (*models.Message, error) {
+func (r *MessageRepoImpl) UpdateMessage(message models.Message) (*models.Message, error) {
 	row := r.db.QueryRow("UPDATE messages SET message_text = $2, chat_id = $3, created_by=$4,updated_at=$5 WHERE id = $1",
 		message.ChatID, message.Text, message.ChatID, message.CreatedBy, time.Now())
 	if row.Err() != nil {
@@ -106,7 +106,7 @@ func (r *MessageR) UpdateMessage(message models.Message) (*models.Message, error
 	return &message, nil
 }
 
-func (r *MessageR) DeleteMessage(id uint64) error {
+func (r *MessageRepoImpl) DeleteMessage(id uint64) error {
 	row := r.db.QueryRow("DELETE FROM messages WHERE id=$1", id)
 	if row.Err() != nil {
 		return row.Err()
@@ -114,7 +114,7 @@ func (r *MessageR) DeleteMessage(id uint64) error {
 	return nil
 }
 
-func (r *MessageR) CreateUserMessages(userMessages []models.UserMessage) error {
+func (r *MessageRepoImpl) CreateUserMessages(userMessages []models.UserMessage) error {
 	for _, userMessage := range userMessages {
 		row := r.db.QueryRow(
 			"INSERT INTO user_message (user_id,message_id,is_read) VALUES ($1, $2,$3)",
@@ -127,7 +127,7 @@ func (r *MessageR) CreateUserMessages(userMessages []models.UserMessage) error {
 	return nil
 }
 
-func (r *MessageR) UpdateUserMessage(userMessage models.UserMessage) (*models.UserMessage, error) {
+func (r *MessageRepoImpl) UpdateUserMessage(userMessage models.UserMessage) (*models.UserMessage, error) {
 	row := r.db.QueryRow("UPDATE user_message SET user_id = $1, message_id = $2, is_read=$3 WHERE user_id = $1",
 		userMessage.UserID, userMessage.MessageID, userMessage.IsRead)
 	if row.Err() != nil {
@@ -136,7 +136,7 @@ func (r *MessageR) UpdateUserMessage(userMessage models.UserMessage) (*models.Us
 	return &userMessage, nil
 }
 
-func (r *MessageR) DeleteUserMessage(userMessage models.UserMessage) error {
+func (r *MessageRepoImpl) DeleteUserMessage(userMessage models.UserMessage) error {
 	row := r.db.QueryRow("DELETE FROM user_message WHERE user_id=$1 AND message_id=$2", userMessage.UserID, userMessage.MessageID)
 	if row.Err() != nil {
 		return row.Err()

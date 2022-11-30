@@ -4,75 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        #UsersList{
-            background-color:gray ;
-            width: 250px;
-            height: auto;
-            border-radius: 3px;
-            margin-top: 36px;
-            margin-bottom: 10px;
-            padding: 10px 0px 10px 0px;
-
-
-        }
-
-        .UserListItem{
-            
-            width: 200px;
-            height: 60px;
-            background-color: lightgray;
-            border-radius: 4px;
-            margin: 5px;
-            padding: 10px 0px 30px 4px;
-            
-        }
-
-        .itemform{
-            display: flex;
-        }
-        
-        .itemform button{
-            margin-left: 20%;
-            border-radius: 7px;
-        }
-
-        .row{
-            display: flex;
-        }
-
-        .row h3{
-            padding-right: 10px;
-        }
-
-        #NoUsers{
-            color: red;
-        }
-    </style>
-    <title>Chat</title>
+    <title>Document</title>
 </head>
 <body>
-    <div id="UsersList">
-        {{ with .Users }}
-            {{ range . }}
-                <div class="UserListItem">
-                    <form class="itemform" action="/create_chat" method="POST">
-                        <div class="row">
-                            <h3 id="FirstName">{{.FirstName}}</h3>
-                            <h3 id="LastName">{{.LastName}}</h3>
-                        </div>
-                        <button name="StartChatBut" value={{.ID}}>Начать чат</button>
-                    </form>
-                </div>
-            {{else}}
-                <h1 id="NoUsers" class="center">No Games</h1>
-            {{end}}
-        {{end}}
-    </div>
-    <a href="/registration"><button>Регистрация</button></a>
-    <a href="/login"><button>Войти</button></a>
-    <form action="/create_chat" method="POST">
-        <button name="UserID" value={{.UserID}}>Создать чат</button>
-    </form>
+    {{.}}
 </body>
 </html>

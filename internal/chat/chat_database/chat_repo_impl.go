@@ -1,20 +1,20 @@
-package repository
+package chat_database
 
 import (
-	"chat-app/models"
+	"chat-app/internal/models"
 
 	"github.com/jmoiron/sqlx"
 )
 
-type ChatR struct {
+type ChatRepoImpl struct {
 	db *sqlx.DB
 }
 
-func NewChatR(db *sqlx.DB) *ChatR {
-	return &ChatR{db: db}
+func NewChatRepoImpl(db *sqlx.DB) *ChatRepoImpl {
+	return &ChatRepoImpl{db: db}
 }
 
-func (r *ChatR) CreateChat(chat models.Chat) (*models.Chat, error) {
+func (r *ChatRepoImpl) CreateChat(chat models.Chat) (*models.Chat, error) {
 	if err := chat.ChatValidation(); err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (r *ChatR) CreateChat(chat models.Chat) (*models.Chat, error) {
 	return &chat, nil
 }
 
-func (r *ChatR) GetChat(id uint64) (*models.Chat, error) {
+func (r *ChatRepoImpl) GetChat(id uint64) (*models.Chat, error) {
 	var chat models.Chat
 	if err := r.db.QueryRow(
 		"SELECT chat_name,chat_description,created_by,created_at FROM chats WHERE id = $1", id,
@@ -38,7 +38,7 @@ func (r *ChatR) GetChat(id uint64) (*models.Chat, error) {
 	return &chat, nil
 }
 
-func (r *ChatR) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
+func (r *ChatRepoImpl) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
 	var chats []models.Chat
 	if filter != nil {
 		if filter.IDs != nil {
@@ -86,7 +86,7 @@ func (r *ChatR) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
 	return chats, nil
 }
 
-func (r *ChatR) UpdateChat(chat models.Chat) (*models.Chat, error) {
+func (r *ChatRepoImpl) UpdateChat(chat models.Chat) (*models.Chat, error) {
 	row := r.db.QueryRow("UPDATE chats SET chat_name = $2, chat_description = $3, created_by=$4, updated_at=$5 WHERE id = $1",
 		chat.ID, chat.Name, chat.Description, chat.CreatedBy, chat.UpdatedAt)
 	if row.Err() != nil {
@@ -95,7 +95,7 @@ func (r *ChatR) UpdateChat(chat models.Chat) (*models.Chat, error) {
 	return &chat, nil
 }
 
-func (r *ChatR) DeleteChat(id uint64) error {
+func (r *ChatRepoImpl) DeleteChat(id uint64) error {
 	row := r.db.QueryRow("DELETE FROM chats WHERE id=$1", id)
 	if row.Err() != nil {
 		return row.Err()
