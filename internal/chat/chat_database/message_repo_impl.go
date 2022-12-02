@@ -1,7 +1,7 @@
 package chat_database
 
 import (
-	"chat-app/internal/models"
+	"chat-app/internal/chat/chat_domain"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -15,8 +15,8 @@ func NewMessageRepoImpl(db *sqlx.DB) *MessageRepoImpl {
 	return &MessageRepoImpl{db: db}
 }
 
-func (r *MessageRepoImpl) GetMessage(id uint64) (*models.Message, error) {
-	var m models.Message
+func (r *MessageRepoImpl) GetMessage(id uint64) (*chat_domain.Message, error) {
+	var m chat_domain.Message
 	if err := r.db.QueryRow(
 		"SELECT id,message_text,chat_id,created_by,created_at FROM messages WHERE id = $1", id,
 	).Scan(&m.ID, &m.Text, &m.ChatID, &m.CreatedBy, &m.CreatedAt); err != nil {
@@ -25,12 +25,12 @@ func (r *MessageRepoImpl) GetMessage(id uint64) (*models.Message, error) {
 	return &m, nil
 }
 
-func (r *MessageRepoImpl) GetMessages(filter *models.MessageFilter) ([]models.Message, error) {
-	var messages []models.Message
+func (r *MessageRepoImpl) GetMessages(filter *chat_domain.MessageFilter) ([]chat_domain.Message, error) {
+	var messages []chat_domain.Message
 	if filter != nil {
 		if filter.IDs != nil {
 			for _, id := range filter.IDs {
-				var m models.Message
+				var m chat_domain.Message
 				if err := r.db.QueryRow(
 					"SELECT id,message_text,chat_id,created_by,created_at FROM messages WHERE id = $1", id,
 				).Scan(&m.ID, &m.Text, &m.ChatID, &m.CreatedBy, &m.CreatedAt); err != nil {
@@ -44,14 +44,14 @@ func (r *MessageRepoImpl) GetMessages(filter *models.MessageFilter) ([]models.Me
 				return nil, err
 			}
 			for rows.Next() {
-				var m models.Message
+				var m chat_domain.Message
 				err = rows.StructScan(&m)
 				messages = append(messages, m)
 			}
 
 		} else if filter.ChatIDs != nil {
 			for _, id := range filter.ChatIDs {
-				var m models.Message
+				var m chat_domain.Message
 				if err := r.db.QueryRow(
 					"SELECT id,message_text,chat_id,created_by,created_at FROM messages WHERE chat_id = $1", id,
 				).Scan(&m.ID, &m.Text, &m.ChatID, &m.CreatedBy, &m.CreatedAt); err != nil {
@@ -61,7 +61,7 @@ func (r *MessageRepoImpl) GetMessages(filter *models.MessageFilter) ([]models.Me
 			}
 		} else if filter.UserIDs != nil {
 			for _, id := range filter.UserIDs {
-				var m models.Message
+				var m chat_domain.Message
 				if err := r.db.QueryRow(
 					"SELECT id,message_text,chat_id,created_by,created_at FROM messages WHERE created_by = $1", id,
 				).Scan(&m.ID, &m.Text, &m.ChatID, &m.CreatedBy, &m.CreatedAt); err != nil {
@@ -76,7 +76,7 @@ func (r *MessageRepoImpl) GetMessages(filter *models.MessageFilter) ([]models.Me
 			return nil, err
 		}
 		for rows.Next() {
-			var m models.Message
+			var m chat_domain.Message
 			err = rows.StructScan(&m)
 			messages = append(messages, m)
 		}
@@ -85,7 +85,7 @@ func (r *MessageRepoImpl) GetMessages(filter *models.MessageFilter) ([]models.Me
 	return messages, nil
 }
 
-func (r *MessageRepoImpl) CreateMessage(message models.Message) (*models.Message, error) {
+func (r *MessageRepoImpl) CreateMessage(message chat_domain.Message) (*chat_domain.Message, error) {
 	err := r.db.QueryRow(
 		"INSERT INTO messages (message_text,chat_id,created_by,created_at) VALUES ($1, $2,$3,$4) RETURNING id",
 		message.Text, message.ChatID, message.CreatedBy, message.CreatedAt).Scan(&message.ID)
@@ -97,7 +97,7 @@ func (r *MessageRepoImpl) CreateMessage(message models.Message) (*models.Message
 	return &message, nil
 }
 
-func (r *MessageRepoImpl) UpdateMessage(message models.Message) (*models.Message, error) {
+func (r *MessageRepoImpl) UpdateMessage(message chat_domain.Message) (*chat_domain.Message, error) {
 	row := r.db.QueryRow("UPDATE messages SET message_text = $2, chat_id = $3, created_by=$4,updated_at=$5 WHERE id = $1",
 		message.ChatID, message.Text, message.ChatID, message.CreatedBy, time.Now())
 	if row.Err() != nil {
@@ -114,7 +114,7 @@ func (r *MessageRepoImpl) DeleteMessage(id uint64) error {
 	return nil
 }
 
-func (r *MessageRepoImpl) CreateUserMessages(userMessages []models.UserMessage) error {
+func (r *MessageRepoImpl) CreateUserMessages(userMessages []chat_domain.UserMessage) error {
 	for _, userMessage := range userMessages {
 		row := r.db.QueryRow(
 			"INSERT INTO user_message (user_id,message_id,is_read) VALUES ($1, $2,$3)",
@@ -127,7 +127,7 @@ func (r *MessageRepoImpl) CreateUserMessages(userMessages []models.UserMessage) 
 	return nil
 }
 
-func (r *MessageRepoImpl) UpdateUserMessage(userMessage models.UserMessage) (*models.UserMessage, error) {
+func (r *MessageRepoImpl) UpdateUserMessage(userMessage chat_domain.UserMessage) (*chat_domain.UserMessage, error) {
 	row := r.db.QueryRow("UPDATE user_message SET user_id = $1, message_id = $2, is_read=$3 WHERE user_id = $1",
 		userMessage.UserID, userMessage.MessageID, userMessage.IsRead)
 	if row.Err() != nil {
@@ -136,7 +136,7 @@ func (r *MessageRepoImpl) UpdateUserMessage(userMessage models.UserMessage) (*mo
 	return &userMessage, nil
 }
 
-func (r *MessageRepoImpl) DeleteUserMessage(userMessage models.UserMessage) error {
+func (r *MessageRepoImpl) DeleteUserMessage(userMessage chat_domain.UserMessage) error {
 	row := r.db.QueryRow("DELETE FROM user_message WHERE user_id=$1 AND message_id=$2", userMessage.UserID, userMessage.MessageID)
 	if row.Err() != nil {
 		return row.Err()

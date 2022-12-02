@@ -1,12 +1,10 @@
 package chat_domain
 
-import "chat-app/internal/models"
-
 type ChatService interface {
-	GetChat(id uint64) (*models.Chat, error)
-	GetChats(filter *models.ChatFilter) ([]models.Chat, error)
-	CreateChat(chat models.Chat) (*models.Chat, error)
-	UpdateChat(chat models.Chat) (*models.Chat, error)
+	GetChat(id uint64) (*Chat, error)
+	GetChats(filter *ChatFilter) ([]Chat, error)
+	CreateChat(chat Chat) (*Chat, error)
+	UpdateChat(chat Chat) *Chat
 	DeleteChat(id uint64) error
 }
 
@@ -18,19 +16,19 @@ func NewChatServiceImp(repo ChatRepository) *ChatServiceImp {
 	return &ChatServiceImp{repo: repo}
 }
 
-func (s *ChatServiceImp) CreateChat(chat models.Chat) (*models.Chat, error) {
+func (s *ChatServiceImp) CreateChat(chat Chat) (*Chat, error) {
 	return s.repo.CreateChat(chat)
 }
 
-func (s *ChatServiceImp) GetChat(id uint64) (*models.Chat, error) {
+func (s *ChatServiceImp) GetChat(id uint64) (*Chat, error) {
 	return s.repo.GetChat(id)
 }
 
-func (s *ChatServiceImp) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
+func (s *ChatServiceImp) GetChats(filter *ChatFilter) ([]Chat, error) {
 	return s.repo.GetChats(filter)
 }
 
-func (s *ChatServiceImp) UpdateChat(chat models.Chat) (*models.Chat, error) {
+func (s *ChatServiceImp) UpdateChat(chat Chat) (*Chat, error) {
 	return s.repo.UpdateChat(chat)
 }
 

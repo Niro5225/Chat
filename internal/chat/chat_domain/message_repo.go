@@ -1,15 +1,13 @@
 package chat_domain
 
-import "chat-app/internal/models"
-
 type MessageRepository interface {
-	GetMessage(id uint64) (*models.Message, error)
-	GetMessages(filter *models.MessageFilter) ([]models.Message, error)
-	CreateMessage(chat models.Message) (*models.Message, error)
-	UpdateMessage(chat models.Message) (*models.Message, error)
+	GetMessage(id uint64) (*Message, error)
+	GetMessages(filter *MessageFilter) ([]Message, error)
+	CreateMessage(chat Message) (*Message, error)
+	UpdateMessage(chat Message) (*Message, error)
 	DeleteMessage(id uint64) error
 
-	CreateUserMessages(userMessage []models.UserMessage) error
-	UpdateUserMessage(message models.UserMessage) (*models.UserMessage, error)
-	DeleteUserMessage(userMessage models.UserMessage) error
+	CreateUserMessages(userMessage []UserMessage) error
+	UpdateUserMessage(message UserMessage) (*UserMessage, error)
+	DeleteUserMessage(userMessage UserMessage) error
 }

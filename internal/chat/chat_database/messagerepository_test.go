@@ -1,7 +1,7 @@
 package chat_database
 
 import (
-	"chat-app/internal/models"
+	"chat-app/internal/chat/chat_domain"
 	"testing"
 	"time"
 
@@ -14,9 +14,9 @@ var (
 
 func TestCreateMessage(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, err := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message, err := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
 
 	assert.NoError(t, err)
 	assert.NotNil(t, message)
@@ -28,9 +28,9 @@ func TestCreateMessage(t *testing.T) {
 
 func TestGetMessage(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
 
 	getMessage, err := messageR.GetMessage(message.ID)
 
@@ -44,13 +44,13 @@ func TestGetMessage(t *testing.T) {
 
 func TestGetMessagesByIDs(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
-	message1, _ := messageR.CreateMessage(*models.NewMessage("test text1", chat.ID, u.ID, time.Now()))
-	message2, _ := messageR.CreateMessage(*models.NewMessage("test text2", chat.ID, u.ID, time.Now()))
+	message, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message1, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text1", chat.ID, u.ID, time.Now()))
+	message2, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text2", chat.ID, u.ID, time.Now()))
 
-	filter := models.MessageFilter{IDs: []uint64{message.ID, message1.ID, message2.ID}}
+	filter := chat_domain.MessageFilter{IDs: []uint64{message.ID, message1.ID, message2.ID}}
 
 	GetMessages, err := messageR.GetMessages(&filter)
 
@@ -64,11 +64,11 @@ func TestGetMessagesByIDs(t *testing.T) {
 
 func TestGetMessagesBySearch(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
 
-	filter := models.MessageFilter{Search: &message.Text}
+	filter := chat_domain.MessageFilter{Search: &message.Text}
 
 	GetMessages, err := messageR.GetMessages(&filter)
 
@@ -82,13 +82,13 @@ func TestGetMessagesBySearch(t *testing.T) {
 
 func TestGetMessagesByChatIDs(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
-	message1, _ := messageR.CreateMessage(*models.NewMessage("test text1", chat.ID, u.ID, time.Now()))
-	message2, _ := messageR.CreateMessage(*models.NewMessage("test text2", chat.ID, u.ID, time.Now()))
+	message, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message1, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text1", chat.ID, u.ID, time.Now()))
+	message2, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text2", chat.ID, u.ID, time.Now()))
 
-	filter := models.MessageFilter{ChatIDs: []uint64{message.ChatID, message1.ChatID, message2.ChatID}}
+	filter := chat_domain.MessageFilter{ChatIDs: []uint64{message.ChatID, message1.ChatID, message2.ChatID}}
 
 	GetMessages, err := messageR.GetMessages(&filter)
 
@@ -102,13 +102,13 @@ func TestGetMessagesByChatIDs(t *testing.T) {
 
 func TestGetMessagesByUserIDs(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
-	message1, _ := messageR.CreateMessage(*models.NewMessage("test text1", chat.ID, u.ID, time.Now()))
-	message2, _ := messageR.CreateMessage(*models.NewMessage("test text2", chat.ID, u.ID, time.Now()))
+	message, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message1, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text1", chat.ID, u.ID, time.Now()))
+	message2, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text2", chat.ID, u.ID, time.Now()))
 
-	filter := models.MessageFilter{UserIDs: []uint64{message.CreatedBy, message1.CreatedBy, message2.CreatedBy}}
+	filter := chat_domain.MessageFilter{UserIDs: []uint64{message.CreatedBy, message1.CreatedBy, message2.CreatedBy}}
 
 	GetMessages, err := messageR.GetMessages(&filter)
 
@@ -122,9 +122,9 @@ func TestGetMessagesByUserIDs(t *testing.T) {
 
 func TestUpdateMessage(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
 
 	message.Text = "new message"
 
@@ -140,9 +140,9 @@ func TestUpdateMessage(t *testing.T) {
 
 func TestDeleteMessage(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	chat, _ := chatR.CreateChat(*models.NewChat("testName", "testDescription", u.ID, time.Now()))
+	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
 
-	message, _ := messageR.CreateMessage(*models.NewMessage("test text", chat.ID, u.ID, time.Now()))
+	message, _ := messageR.CreateMessage(*chat_domain.NewMessage("test text", chat.ID, u.ID, time.Now()))
 
 	err := messageR.DeleteMessage(message.ID)
 

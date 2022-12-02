@@ -1,7 +1,7 @@
 package chat_database
 
 import (
-	"chat-app/internal/models"
+	"chat-app/internal/chat/chat_domain"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -14,7 +14,7 @@ func NewChatRepoImpl(db *sqlx.DB) *ChatRepoImpl {
 	return &ChatRepoImpl{db: db}
 }
 
-func (r *ChatRepoImpl) CreateChat(chat models.Chat) (*models.Chat, error) {
+func (r *ChatRepoImpl) CreateChat(chat chat_domain.Chat) (*chat_domain.Chat, error) {
 	if err := chat.ChatValidation(); err != nil {
 		return nil, err
 	}
@@ -28,8 +28,8 @@ func (r *ChatRepoImpl) CreateChat(chat models.Chat) (*models.Chat, error) {
 	return &chat, nil
 }
 
-func (r *ChatRepoImpl) GetChat(id uint64) (*models.Chat, error) {
-	var chat models.Chat
+func (r *ChatRepoImpl) GetChat(id uint64) (*chat_domain.Chat, error) {
+	var chat chat_domain.Chat
 	if err := r.db.QueryRow(
 		"SELECT chat_name,chat_description,created_by,created_at FROM chats WHERE id = $1", id,
 	).Scan(&chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
@@ -38,12 +38,12 @@ func (r *ChatRepoImpl) GetChat(id uint64) (*models.Chat, error) {
 	return &chat, nil
 }
 
-func (r *ChatRepoImpl) GetChats(filter *models.ChatFilter) ([]models.Chat, error) {
-	var chats []models.Chat
+func (r *ChatRepoImpl) GetChats(filter *chat_domain.ChatFilter) ([]chat_domain.Chat, error) {
+	var chats []chat_domain.Chat
 	if filter != nil {
 		if filter.IDs != nil {
 			for _, id := range filter.IDs {
-				var chat models.Chat
+				var chat chat_domain.Chat
 				if err := r.db.QueryRow(
 					"SELECT id, chat_name,chat_description,created_by,created_at FROM chats WHERE id = $1", id,
 				).Scan(&chat.ID, &chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
@@ -57,13 +57,13 @@ func (r *ChatRepoImpl) GetChats(filter *models.ChatFilter) ([]models.Chat, error
 				return nil, err
 			}
 			for rows.Next() {
-				var chat models.Chat
+				var chat chat_domain.Chat
 				err = rows.StructScan(&chat)
 				chats = append(chats, chat)
 			}
 		} else if filter.UserIDs != nil {
 			for _, id := range filter.UserIDs {
-				var chat models.Chat
+				var chat chat_domain.Chat
 				if err := r.db.QueryRow(
 					"SELECT id, chat_name,chat_description,created_by,created_at FROM chats WHERE created_by = $1", id,
 				).Scan(&chat.ID, &chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
@@ -78,7 +78,7 @@ func (r *ChatRepoImpl) GetChats(filter *models.ChatFilter) ([]models.Chat, error
 			return nil, err
 		}
 		for rows.Next() {
-			var chat models.Chat
+			var chat chat_domain.Chat
 			err = rows.StructScan(&chat)
 			chats = append(chats, chat)
 		}
@@ -86,7 +86,7 @@ func (r *ChatRepoImpl) GetChats(filter *models.ChatFilter) ([]models.Chat, error
 	return chats, nil
 }
 
-func (r *ChatRepoImpl) UpdateChat(chat models.Chat) (*models.Chat, error) {
+func (r *ChatRepoImpl) UpdateChat(chat chat_domain.Chat) (*chat_domain.Chat, error) {
 	row := r.db.QueryRow("UPDATE chats SET chat_name = $2, chat_description = $3, created_by=$4, updated_at=$5 WHERE id = $1",
 		chat.ID, chat.Name, chat.Description, chat.CreatedBy, chat.UpdatedAt)
 	if row.Err() != nil {

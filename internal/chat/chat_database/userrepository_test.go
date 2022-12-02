@@ -1,8 +1,8 @@
 package chat_database
 
 import (
+	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/config"
-	"chat-app/internal/models"
 	"fmt"
 	"log"
 	"testing"
@@ -14,7 +14,7 @@ var (
 	cfg      = config.New_config()
 	db, err  = NewDB(*cfg)
 	r        = NewUserRepoImpl(db)
-	TestUser = models.NewUser("test", "test", "testemail")
+	TestUser = chat_domain.NewUser("test", "test", "testemail")
 )
 
 func truncTable(table string) {
@@ -72,7 +72,7 @@ func TestCreateUserCredential(t *testing.T) {
 
 	u, _ := r.CreateUser(*TestUser)
 
-	userCredential := models.NewUserCredential(u.ID, "testpassword", u.Email)
+	userCredential := chat_domain.NewUserCredential(u.ID, "testpassword", u.Email)
 
 	userCredential1, err := r.CreateUserCredential(*userCredential)
 
@@ -86,7 +86,7 @@ func TestCreateUserCredential(t *testing.T) {
 func TestUpdateUserCredential(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
 
-	userCredential := models.NewUserCredential(u.ID, "testpassword", u.Email)
+	userCredential := chat_domain.NewUserCredential(u.ID, "testpassword", u.Email)
 
 	userCredential, err = r.CreateUserCredential(*userCredential)
 
@@ -102,7 +102,7 @@ func TestUpdateUserCredential(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	newCred := models.NewUserCredential(newUser.ID, "testpassword", newUser.Email)
+	newCred := chat_domain.NewUserCredential(newUser.ID, "testpassword", newUser.Email)
 	newCred, err = r.UpdateUserCredential(*newCred)
 
 	assert.NoError(t, err)
@@ -114,9 +114,9 @@ func TestUpdateUserCredential(t *testing.T) {
 
 func TestGetUsersByIDs(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	u1, _ := r.CreateUser(*models.NewUser("second", "second", "second"))
-	u2, _ := r.CreateUser(*models.NewUser("third", "third", "third"))
-	filter := models.UserFilter{IDs: []uint64{u.ID, u1.ID, u2.ID}}
+	u1, _ := r.CreateUser(*chat_domain.NewUser("second", "second", "second"))
+	u2, _ := r.CreateUser(*chat_domain.NewUser("third", "third", "third"))
+	filter := chat_domain.UserFilter{IDs: []uint64{u.ID, u1.ID, u2.ID}}
 	users, err := r.GetUsers(&filter)
 
 	assert.NoError(t, err)
@@ -126,7 +126,7 @@ func TestGetUsersByIDs(t *testing.T) {
 
 func TestGetUsersByEmail(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	filter := models.UserFilter{Email: &u.Email}
+	filter := chat_domain.UserFilter{Email: &u.Email}
 	users, err := r.GetUsers(&filter)
 
 	assert.NoError(t, err)
@@ -137,45 +137,11 @@ func TestGetUsersByEmail(t *testing.T) {
 
 func TestGetUsersBySearch(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	filter := models.UserFilter{Search: &u.FirstName}
+	filter := chat_domain.UserFilter{Search: &u.FirstName}
 	users, err := r.GetUsers(&filter)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, users)
 
 	truncTable("users")
-}
-
-func TestSignUp(t *testing.T) {
-	u, _ := r.CreateUser(*TestUser)
-
-	userCredential := models.NewUserCredential(u.ID, "testpassword", u.Email)
-
-	userCredential, _ = r.CreateUserCredential(*userCredential)
-
-	signedUser, token, err := r.SignUp(*u, *userCredential)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, signedUser)
-	assert.NotEmpty(t, token)
-
-	truncTable("users")
-	truncTable("user_credential")
-}
-
-func TestSignIn(t *testing.T) {
-	u, _ := r.CreateUser(*TestUser)
-
-	userCredential, _ := r.CreateUserCredential(*models.NewUserCredential(u.ID, "testpassword", u.Email))
-
-	password := "testpassword"
-
-	signedUser, token, err := r.SignIn(userCredential.Email, password)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, signedUser)
-	assert.NotEmpty(t, token)
-
-	truncTable("users")
-	truncTable("user_credential")
 }
