@@ -1,4 +1,4 @@
-package chat_domain
+package user
 
 import (
 	"time"

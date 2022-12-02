@@ -1,18 +1,19 @@
 package chat_domain
 
 import (
+	"chat-app/internal/user"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 type UserService interface {
-	GetUser(id uint64) (*User, error)
-	GetUsers(userFilter *UserFilter) ([]User, error)
-	SignIn(email, password string) (*User, string, error)                   //LOGIN
-	SignUp(user User, userCredential UserCredential) (*User, string, error) //REG
-	CreateUser(user User) (*User, error)
-	UpdateUser(user User) (*User, error)
+	GetUser(id uint64) (*user.User, error)
+	GetUsers(userFilter *UserFilter) ([]user.User, error)
+	SignIn(email, password string) (*user.User, string, error)                        //LOGIN
+	SignUp(user user.User, userCredential UserCredential) (*user.User, string, error) //REG
+	CreateUser(user user.User) (*user.User, error)
+	UpdateUser(user user.User) (*user.User, error)
 	CreateUserCredential(credential UserCredential) (*UserCredential, error)
 	GetUserCredential(email string) (*UserCredential, error)
 	UpdateUserCredential(credential UserCredential) (*UserCredential, error)
@@ -29,7 +30,7 @@ func NewUserServiceImp(repo UserRepository) *UserServiceImp {
 	return &UserServiceImp{repo: repo}
 }
 
-func (s *UserServiceImp) CreateUser(user User) (*User, error) {
+func (s *UserServiceImp) CreateUser(user user.User) (*user.User, error) {
 	if err := user.ValidateUser(); err != nil {
 		return nil, err
 	}
@@ -44,11 +45,11 @@ func (s *UserServiceImp) DeleteUser(id uint64) error {
 	return s.repo.DeleteUser(id)
 }
 
-func (s *UserServiceImp) GetUser(id uint64) (*User, error) {
+func (s *UserServiceImp) GetUser(id uint64) (*user.User, error) {
 	return s.repo.GetUser(id)
 }
 
-func (s *UserServiceImp) GetUsers(userFilter *UserFilter) ([]User, error) {
+func (s *UserServiceImp) GetUsers(userFilter *UserFilter) ([]user.User, error) {
 	return s.repo.GetUsers(userFilter)
 }
 
@@ -67,7 +68,7 @@ func GenerateToken(userId uint64) (string, error) {
 	return token.SignedString([]byte(tokenKey))
 }
 
-func (s *UserServiceImp) SignIn(email, password string) (*User, string, error) {
+func (s *UserServiceImp) SignIn(email, password string) (*user.User, string, error) {
 	uc, err := s.GetUserCredential(email)
 	if err != nil {
 		return nil, "", err
@@ -88,7 +89,7 @@ func (s *UserServiceImp) SignIn(email, password string) (*User, string, error) {
 	return user, token, nil
 }
 
-func (s *UserServiceImp) SignUp(user User, userCredential UserCredential) (*User, string, error) {
+func (s *UserServiceImp) SignUp(user user.User, userCredential UserCredential) (*user.User, string, error) {
 	token, err := GenerateToken(user.ID)
 	if err != nil {
 		return nil, "", err
@@ -96,7 +97,7 @@ func (s *UserServiceImp) SignUp(user User, userCredential UserCredential) (*User
 	return &user, token, nil
 }
 
-func (s *UserServiceImp) UpdateUser(user User) (*User, error) {
+func (s *UserServiceImp) UpdateUser(user user.User) (*user.User, error) {
 	return s.repo.UpdateUser(user)
 }
 

@@ -2,6 +2,7 @@ package chat_database
 
 import (
 	"chat-app/internal/chat/chat_domain"
+	"chat-app/internal/user"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -15,7 +16,7 @@ func NewUserRepoImpl(db *sqlx.DB) *UserRepoImpl {
 	return &UserRepoImpl{db: db}
 }
 
-func (r *UserRepoImpl) CreateUser(user chat_domain.User) (*chat_domain.User, error) {
+func (r *UserRepoImpl) CreateUser(user user.User) (*user.User, error) {
 	err := r.db.QueryRow(
 		"INSERT INTO users (first_name,last_name,email,created_at) VALUES ($1, $2,$3,$4) RETURNING id", user.FirstName, user.LastName, user.Email, user.CreatedAt,
 	).Scan(&user.ID)
@@ -35,8 +36,8 @@ func (r *UserRepoImpl) DeleteUser(id uint64) error {
 	return nil
 }
 
-func (r *UserRepoImpl) GetUser(id uint64) (*chat_domain.User, error) {
-	var u chat_domain.User
+func (r *UserRepoImpl) GetUser(id uint64) (*user.User, error) {
+	var u user.User
 	if err := r.db.QueryRow(
 		"SELECT first_name,last_name,email FROM users WHERE id = $1", id,
 	).Scan(&u.FirstName, &u.LastName, &u.Email); err != nil {
@@ -48,12 +49,12 @@ func (r *UserRepoImpl) GetUser(id uint64) (*chat_domain.User, error) {
 	return &u, nil
 }
 
-func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]chat_domain.User, error) {
-	users := []chat_domain.User{}
+func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]user.User, error) {
+	users := []user.User{}
 	if userFilter != nil {
 		if len(userFilter.IDs) != 0 {
 			for _, id := range userFilter.IDs {
-				var u chat_domain.User
+				var u user.User
 				if err := r.db.QueryRow(
 					"SELECT first_name,last_name,email FROM users WHERE id = $1", id,
 				).Scan(&u.FirstName, &u.LastName, &u.Email); err != nil {
@@ -62,7 +63,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]chat_doma
 				users = append(users, u)
 			}
 		} else if userFilter.Email != nil {
-			var u chat_domain.User
+			var u user.User
 			if err := r.db.QueryRow(
 				"SELECT id,first_name,last_name,email FROM users WHERE email = $1", userFilter.Email,
 			).Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email); err != nil {
@@ -75,7 +76,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]chat_doma
 				return nil, err
 			}
 			for rows.Next() {
-				var u chat_domain.User
+				var u user.User
 				err = rows.StructScan(&u)
 				users = append(users, u)
 			}
@@ -87,7 +88,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]chat_doma
 			return nil, err
 		}
 		for rows.Next() {
-			var u chat_domain.User
+			var u user.User
 			err = rows.StructScan(&u)
 			users = append(users, u)
 		}
@@ -95,46 +96,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]chat_doma
 	return users, nil
 }
 
-// func (r *UserRepoImpl) SignIn(email, password string) (*chat_domain.User, string, error) {
-// 	uc, err := r.GetUserCredential(email)
-// 	if err != nil {
-// 		return nil, "", err
-// 	}
-
-// 	err = uc.CheckPasswords(password)
-// 	if err != nil {
-// 		return nil, "", err
-// 	}
-// 	user, err := r.GetUser(uc.ID)
-// 	if err != nil {
-// 		return nil, "", err
-// 	}
-// 	token, err := GenerateToken(user.ID)
-// 	if err != nil {
-// 		return nil, "", err
-// 	}
-
-// 	return user, token, nil
-// }
-
-// func (r *UserRepoImpl) SignUp(user chat_domain.User, userCredential chat_domain.UserCredential) (*chat_domain.User, string, error) {
-// 	// u, err := r.CreateUser(user)
-// 	// if err != nil {
-// 	// 	return nil, "", err
-// 	// }
-// 	// _, err = r.CreateUserCredential(userCredential)
-// 	// if err != nil {
-// 	// 	return nil, "", err
-// 	// }
-// 	token, err := GenerateToken(user.ID)
-// 	if err != nil {
-// 		return nil, "", err
-// 	}
-
-// 	return &user, token, nil
-// }
-
-func (r *UserRepoImpl) UpdateUser(user chat_domain.User) (*chat_domain.User, error) {
+func (r *UserRepoImpl) UpdateUser(user user.User) (*user.User, error) {
 	row := r.db.QueryRow("UPDATE users SET first_name = $2, last_name = $3, email=$4,updated_at=$5 WHERE id = $1",
 		user.ID, user.FirstName, user.LastName, user.Email, time.Now())
 	if row.Err() != nil {

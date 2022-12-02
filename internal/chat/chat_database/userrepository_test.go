@@ -3,6 +3,7 @@ package chat_database
 import (
 	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/config"
+	"chat-app/internal/user"
 	"fmt"
 	"log"
 	"testing"
@@ -14,7 +15,7 @@ var (
 	cfg      = config.New_config()
 	db, err  = NewDB(*cfg)
 	r        = NewUserRepoImpl(db)
-	TestUser = chat_domain.NewUser("test", "test", "testemail")
+	TestUser = user.NewUser("test", "test", "testemail")
 )
 
 func truncTable(table string) {
@@ -114,8 +115,8 @@ func TestUpdateUserCredential(t *testing.T) {
 
 func TestGetUsersByIDs(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	u1, _ := r.CreateUser(*chat_domain.NewUser("second", "second", "second"))
-	u2, _ := r.CreateUser(*chat_domain.NewUser("third", "third", "third"))
+	u1, _ := r.CreateUser(*user.NewUser("second", "second", "second"))
+	u2, _ := r.CreateUser(*user.NewUser("third", "third", "third"))
 	filter := chat_domain.UserFilter{IDs: []uint64{u.ID, u1.ID, u2.ID}}
 	users, err := r.GetUsers(&filter)
 
