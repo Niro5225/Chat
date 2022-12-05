@@ -5,7 +5,10 @@ import (
 	"chat-app/internal/api/server"
 	"chat-app/internal/chat/chat_database"
 	"chat-app/internal/chat/chat_domain"
+	chathttp "chat-app/internal/chat/chat_http"
 	"chat-app/internal/config"
+	"chat-app/internal/infrastructure/database"
+	userhttp "chat-app/internal/user/user_http"
 
 	"github.com/sirupsen/logrus"
 )
@@ -13,7 +16,7 @@ import (
 func main() {
 	cfg := config.New_config() //обьект конфига
 
-	db, err := chat_database.NewDB(*cfg) //обьекconfig
+	db, err := database.NewDB(*cfg) //обьекconfig
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -28,8 +31,11 @@ func main() {
 	CharService := chat_domain.NewChatServiceImp(ChatRepository)
 	MessageService := chat_domain.NewMessageServiceImp(MessageRepository)
 
-	router := handlers.NewRouter(UserService, CharService, MessageService) //обьект роутера
-	serv := server.NewApiServer(cfg, logrus.New(), router)                 //обьект сервера
+	userHandlers := userhttp.NewUserHandlers(UserService, CharService, MessageService)
+	catHandlers := chathttp.NewChatHandler(UserService, CharService, MessageService)
+
+	router := handlers.NewRouter(userHandlers, catHandlers) //обьект роутера
+	serv := server.NewApiServer(cfg, logrus.New(), router)  //обьект сервера
 
 	if err := serv.Start(); err != nil { //запуск сервера
 		logrus.Fatal(err.Error())

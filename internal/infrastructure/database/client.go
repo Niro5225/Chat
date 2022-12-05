@@ -1,4 +1,4 @@
-package chat_database
+package database
 
 import (
 	"github.com/jmoiron/sqlx"

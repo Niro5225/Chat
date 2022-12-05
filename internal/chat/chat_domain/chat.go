@@ -3,12 +3,12 @@ package chat_domain
 import "time"
 
 type Chat struct {
-	ID          uint64
-	Name        string
-	Description string
-	CreatedBy   uint64
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          uint64    `db:"id"`
+	Name        string    `db:"chat_name"`
+	Description string    `db:"chat_description"`
+	CreatedBy   uint64    `db:"created_by"`
+	CreatedAt   time.Time `db:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at"`
 }
 
 func NewChat(name, descr string, id uint64, createTime time.Time) *Chat {

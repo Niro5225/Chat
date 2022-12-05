@@ -34,6 +34,18 @@ func TestGetChat(t *testing.T) {
 
 }
 
+func TestGetChats(t *testing.T) {
+	u, _ := r.CreateUser(*TestUser)
+	chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))
+
+	GetChats, err := chatR.GetChats(nil)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, GetChats)
+	truncTable("users")
+	truncTable("chats")
+}
+
 func TestGetChatsByIDs(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
 	chat, _ := chatR.CreateChat(*chat_domain.NewChat("testName", "testDescription", u.ID, time.Now()))

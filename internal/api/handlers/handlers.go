@@ -1,84 +1,54 @@
 package handlers
 
 import (
-	"chat-app/internal/chat/chat_domain"
+	chathttp "chat-app/internal/chat/chat_http"
+	userhttp "chat-app/internal/user/user_http"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
 type Router struct {
-	Router         *mux.Router
-	UserService    *chat_domain.UserServiceImp
-	ChatService    *chat_domain.ChatServiceImp
-	MessageService *chat_domain.MessageServiceImp
-	tpl            *template.Template
+	Router       *gin.Engine
+	userHandler  *userhttp.UserHandlers
+	chatHandlers *chathttp.ChatHandlers
+	tpl          *template.Template
 }
 
-func NewRouter(userService *chat_domain.UserServiceImp, chatService *chat_domain.ChatServiceImp, messageService *chat_domain.MessageServiceImp) *Router { //Создание роутера
+func NewRouter(userHandlers *userhttp.UserHandlers, chatHandlers *chathttp.ChatHandlers) *Router { //Создание роутера
 	var tpl *template.Template
 
 	tpl, err := template.ParseGlob("internal\\web\\*.gohtml") //получение всех gohtml файлов
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return &Router{Router: mux.NewRouter(), UserService: userService, ChatService: chatService, MessageService: messageService, tpl: tpl}
+	return &Router{Router: gin.New(), tpl: tpl, chatHandlers: chatHandlers, userHandler: userHandlers}
 }
 
 func (r *Router) Configure_router() { //Настройка роутера
-	r.Router.HandleFunc("/ping", r.ping())
-	r.Router.HandleFunc("/", r.test())
-	r.Router.HandleFunc("/t", r.test1())
+	r.Router.GET("/ping", r.ping)
+	users := r.Router.Group("/users")
+	{
+		users.GET("/", r.userHandler.GetUsers)
+		users.GET("/:id", r.userHandler.GetUserId)
+	}
+	r.Router.GET("/messages", r.userHandler.GetMessages)
+	chats := r.Router.Group("/chats")
+	{
+		chats.GET("/", r.chatHandlers.GetChatsQuery)
+		chats.GET("/:id", r.chatHandlers.ChatsId)
+		chats.POST("/", r.chatHandlers.CreateChat)
+		chats.PUT("/", r.chatHandlers.UpdateChat)
+		chats.DELETE("/:id", r.chatHandlers.DeleteChat)
+	}
 
 }
 
-func (router *Router) ping() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "pong")
-	}
-}
+func (router *Router) ping(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "pong",
+	})
 
-func (router *Router) test() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		u, err := router.UserService.CreateUser(*chat_domain.NewUser("testFirstName", "testLastName", "testEmail"))
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-		}
-		uc, err := router.UserService.CreateUserCredential(*chat_domain.NewUserCredential(u.ID, "testPssword", u.Email))
-		if err != nil {
-			io.WriteString(w, err.Error())
-		}
-
-		su, token, err := router.UserService.SignUp(*u, *uc)
-
-		data := struct {
-			fname string
-			lname string
-			email string
-			token string
-		}{su.FirstName, su.LastName, su.Email, token}
-
-		router.tpl.ExecuteTemplate(w, "index.gohtml", data)
-	}
-}
-
-func (router *Router) test1() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		email := "testEmail"
-		si, token, err := router.UserService.SignIn(email, "testPssword1")
-		if err != nil {
-			io.WriteString(w, err.Error())
-		}
-		data := struct {
-			fname string
-			lname string
-			email string
-			token string
-		}{si.FirstName, si.LastName, si.Email, token}
-
-		router.tpl.ExecuteTemplate(w, "index.gohtml", data)
-	}
 }

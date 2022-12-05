@@ -56,8 +56,8 @@ func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]user.User
 			for _, id := range userFilter.IDs {
 				var u user.User
 				if err := r.db.QueryRow(
-					"SELECT first_name,last_name,email FROM users WHERE id = $1", id,
-				).Scan(&u.FirstName, &u.LastName, &u.Email); err != nil {
+					"SELECT id,first_name,last_name,email FROM users WHERE id = $1", id,
+				).Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email); err != nil {
 					return nil, err
 				}
 				users = append(users, u)
@@ -69,6 +69,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]user.User
 			).Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email); err != nil {
 				return nil, err
 			}
+			users = append(users, u)
 		} else if userFilter.Search != nil {
 
 			rows, err := r.db.Queryx("SELECT * FROM users WHERE first_name=$1 OR last_name=$1", userFilter.Search)
