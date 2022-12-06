@@ -43,6 +43,8 @@ func (r *Router) Configure_router() { //Настройка роутера
 		chats.PUT("/", r.chatHandlers.UpdateChat)
 		chats.DELETE("/:id", r.chatHandlers.DeleteChat)
 	}
+	r.Router.POST("/signin", r.userHandler.Login)
+	r.Router.POST("/signup", r.userHandler.Registration)
 
 }
 

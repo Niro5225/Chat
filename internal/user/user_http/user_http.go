@@ -2,6 +2,7 @@ package userhttp
 
 import (
 	"chat-app/internal/chat/chat_domain"
+	"chat-app/internal/user"
 	"fmt"
 	"log"
 	"net/http"
@@ -123,4 +124,48 @@ func (uh *UserHandlers) GetMessages(c *gin.Context) {
 	for _, message := range messages {
 		fmt.Println(message)
 	}
+}
+
+func (uh *UserHandlers) Login(c *gin.Context) {
+	email := "testLoginEmail"
+	password := "testLoginPassword"
+
+	user, token, err := uh.UserService.SignIn(email, password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"user":  user,
+		"token": token,
+	})
+
+}
+
+func (uh *UserHandlers) Registration(c *gin.Context) {
+	user, err := uh.UserService.CreateUser(*user.NewUser("testRegName", "testRegName", "testRegEmail"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+	}
+	uc, err := uh.UserService.CreateUserCredential(*chat_domain.NewUserCredential(user.ID, "testRegPassword", user.Email))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+	}
+	user, token, err := uh.UserService.SignUp(*user, *uc)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user":  user,
+		"token": token,
+	})
+
 }
