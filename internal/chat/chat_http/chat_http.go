@@ -2,6 +2,8 @@ package chathttp
 
 import (
 	"chat-app/internal/chat/chat_domain"
+	"chat-app/internal/user/user_domain"
+
 	"chat-app/internal/user"
 	"fmt"
 	"log"
@@ -14,12 +16,12 @@ import (
 )
 
 type ChatHandlers struct {
-	UserService    *chat_domain.UserServiceImp
+	UserService    *user_domain.UserServiceImp
 	ChatService    *chat_domain.ChatServiceImp
 	MessageService *chat_domain.MessageServiceImp
 }
 
-func NewChatHandler(userService *chat_domain.UserServiceImp, chatService *chat_domain.ChatServiceImp, messageService *chat_domain.MessageServiceImp) *ChatHandlers {
+func NewChatHandler(userService *user_domain.UserServiceImp, chatService *chat_domain.ChatServiceImp, messageService *chat_domain.MessageServiceImp) *ChatHandlers {
 	return &ChatHandlers{UserService: userService, ChatService: chatService, MessageService: messageService}
 }
 

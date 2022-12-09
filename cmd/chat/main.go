@@ -8,6 +8,8 @@ import (
 	chathttp "chat-app/internal/chat/chat_http"
 	"chat-app/internal/config"
 	"chat-app/internal/infrastructure/database"
+	"chat-app/internal/user/user_database"
+	"chat-app/internal/user/user_domain"
 	userhttp "chat-app/internal/user/user_http"
 
 	"github.com/sirupsen/logrus"
@@ -23,11 +25,11 @@ func main() {
 
 	// repos := chat_domain.NewRepository(db) //обьект репозитория
 	// // services := chat_domain.NewServices(repos) //обьект сервиса
-	UserRepository := chat_database.NewUserRepoImpl(db)
+	UserRepository := user_database.NewUserRepoImpl(db)
 	ChatRepository := chat_database.NewChatRepoImpl(db)
 	MessageRepository := chat_database.NewMessageRepoImpl(db)
 
-	UserService := chat_domain.NewUserServiceImp(UserRepository)
+	UserService := user_domain.NewUserServiceImp(UserRepository)
 	CharService := chat_domain.NewChatServiceImp(ChatRepository)
 	MessageService := chat_domain.NewMessageServiceImp(MessageRepository)
 

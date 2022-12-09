@@ -2,6 +2,12 @@ package chat_database
 
 import (
 	"chat-app/internal/chat/chat_domain"
+	"chat-app/internal/config"
+	"chat-app/internal/infrastructure/database"
+	"chat-app/internal/user"
+	"chat-app/internal/user/user_database"
+	"fmt"
+	"log"
 	"testing"
 	"time"
 
@@ -9,8 +15,18 @@ import (
 )
 
 var (
-	chatR = NewChatRepoImpl(db)
+	cfg      = config.New_config()
+	db, err  = database.NewDB(*cfg)
+	r        = user_database.NewUserRepoImpl(db)
+	TestUser = user.NewUser("test1", "test1", "testemail4")
+	chatR    = NewChatRepoImpl(db)
 )
+
+func truncTable(table string) {
+	if _, err := db.Exec(fmt.Sprintf(fmt.Sprintf("TRUNCATE %s CASCADE", table))); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func TestCreateChat(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)

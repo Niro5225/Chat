@@ -1,4 +1,4 @@
-package chat_database
+package user_database
 
 import (
 	"chat-app/internal/chat/chat_domain"

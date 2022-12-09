@@ -3,6 +3,8 @@ package userhttp
 import (
 	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/user"
+	"chat-app/internal/user/user_domain"
+
 	"fmt"
 	"log"
 	"net/http"
@@ -13,12 +15,12 @@ import (
 )
 
 type UserHandlers struct {
-	UserService    *chat_domain.UserServiceImp
+	UserService    *user_domain.UserServiceImp
 	ChatService    *chat_domain.ChatServiceImp
 	MessageService *chat_domain.MessageServiceImp
 }
 
-func NewUserHandlers(userService *chat_domain.UserServiceImp, chatService *chat_domain.ChatServiceImp, messageService *chat_domain.MessageServiceImp) *UserHandlers {
+func NewUserHandlers(userService *user_domain.UserServiceImp, chatService *chat_domain.ChatServiceImp, messageService *chat_domain.MessageServiceImp) *UserHandlers {
 	return &UserHandlers{UserService: userService, ChatService: chatService, MessageService: messageService}
 }
 
