@@ -2,6 +2,7 @@ package chathttp
 
 import (
 	"chat-app/internal/chat/chat_domain"
+	chatdto "chat-app/internal/chat/chat_dto"
 	"chat-app/internal/user/user_domain"
 
 	"chat-app/internal/user"
@@ -14,6 +15,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+func fromDto(chatDto *chatdto.ChatDTO) chat_domain.Chat {
+	return chat_domain.Chat{ID: chatDto.Id, Name: chatDto.Name, Description: chatDto.Description}
+}
+
+func toDto(chat *chat_domain.Chat) chatdto.ChatDTO {
+	return chatdto.ChatDTO{Id: chat.ID, Name: chat.Name, Description: chat.Description}
+}
 
 type ChatHandlers struct {
 	UserService    *user_domain.UserServiceImp

@@ -1,9 +1,8 @@
 package userdto
 
 type UserDTO struct {
-	Header       string `json:"header"`
-	Boby         string `json:"body"`
-	ShortBody    string `json:"short_body"`
-	CategoryUUID string `json:"category_uuid"`
-	Tags         []int  `json:"tags"`
+	Id        uint64 `json:"user_id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
 }

@@ -4,6 +4,7 @@ import (
 	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/user"
 	"chat-app/internal/user/user_domain"
+	userdto "chat-app/internal/user/user_dto"
 
 	"fmt"
 	"log"
@@ -13,6 +14,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+func fromDto(userDto *userdto.UserDTO) user.User {
+	return user.User{ID: userDto.Id, FirstName: userDto.FirstName, LastName: userDto.LastName, Email: userDto.Email}
+}
+
+func toDto(user *user.User) userdto.UserDTO {
+	return userdto.UserDTO{Id: user.ID, FirstName: user.FirstName, LastName: user.LastName, Email: user.Email}
+}
 
 type UserHandlers struct {
 	UserService    *user_domain.UserServiceImp
