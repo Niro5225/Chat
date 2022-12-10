@@ -1,7 +1,6 @@
 package user_domain
 
 import (
-	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/user"
 
 	"time"
@@ -11,14 +10,14 @@ import (
 
 type UserService interface {
 	GetUser(id uint64) (*user.User, error)
-	GetUsers(userFilter *chat_domain.UserFilter) ([]user.User, error)
-	SignIn(email, password string) (*user.User, string, error)                                    //LOGIN
-	SignUp(user user.User, userCredential chat_domain.UserCredential) (*user.User, string, error) //REG
+	GetUsers(userFilter *UserFilter) ([]user.User, error)
+	SignIn(email, password string) (*user.User, string, error)                        //LOGIN
+	SignUp(user user.User, userCredential UserCredential) (*user.User, string, error) //REG
 	CreateUser(user user.User) (*user.User, error)
 	UpdateUser(user user.User) (*user.User, error)
-	CreateUserCredential(credential chat_domain.UserCredential) (*chat_domain.UserCredential, error)
-	GetUserCredential(email string) (*chat_domain.UserCredential, error)
-	UpdateUserCredential(credential chat_domain.UserCredential) (*chat_domain.UserCredential, error)
+	CreateUserCredential(credential UserCredential) (*UserCredential, error)
+	GetUserCredential(email string) (*UserCredential, error)
+	UpdateUserCredential(credential UserCredential) (*UserCredential, error)
 	DeleteUser(id uint64) error
 }
 
@@ -39,7 +38,7 @@ func (s *UserServiceImp) CreateUser(user user.User) (*user.User, error) {
 	return s.repo.CreateUser(user)
 }
 
-func (s *UserServiceImp) GetUserCredential(email string) (*chat_domain.UserCredential, error) {
+func (s *UserServiceImp) GetUserCredential(email string) (*UserCredential, error) {
 	return s.repo.GetUserCredential(email)
 }
 
@@ -51,7 +50,7 @@ func (s *UserServiceImp) GetUser(id uint64) (*user.User, error) {
 	return s.repo.GetUser(id)
 }
 
-func (s *UserServiceImp) GetUsers(userFilter *chat_domain.UserFilter) ([]user.User, error) {
+func (s *UserServiceImp) GetUsers(userFilter *UserFilter) ([]user.User, error) {
 	return s.repo.GetUsers(userFilter)
 }
 
@@ -91,7 +90,7 @@ func (s *UserServiceImp) SignIn(email, password string) (*user.User, string, err
 	return user, token, nil
 }
 
-func (s *UserServiceImp) SignUp(user user.User, userCredential chat_domain.UserCredential) (*user.User, string, error) {
+func (s *UserServiceImp) SignUp(user user.User, userCredential UserCredential) (*user.User, string, error) {
 	token, err := GenerateToken(user.ID)
 	if err != nil {
 		return nil, "", err
@@ -103,14 +102,14 @@ func (s *UserServiceImp) UpdateUser(user user.User) (*user.User, error) {
 	return s.repo.UpdateUser(user)
 }
 
-func (s *UserServiceImp) CreateUserCredential(credential chat_domain.UserCredential) (*chat_domain.UserCredential, error) {
+func (s *UserServiceImp) CreateUserCredential(credential UserCredential) (*UserCredential, error) {
 	if err := credential.ValidateCredential(); err != nil {
 		return nil, err
 	}
 	return s.repo.CreateUserCredential(credential)
 }
 
-func (s *UserServiceImp) UpdateUserCredential(credential chat_domain.UserCredential) (*chat_domain.UserCredential, error) {
+func (s *UserServiceImp) UpdateUserCredential(credential UserCredential) (*UserCredential, error) {
 	if err := credential.ValidateCredential(); err != nil {
 		return nil, err
 	}

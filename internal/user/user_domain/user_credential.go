@@ -1,4 +1,4 @@
-package chat_domain
+package user_domain
 
 import (
 	"fmt"

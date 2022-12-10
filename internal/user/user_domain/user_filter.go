@@ -1,4 +1,4 @@
-package chat_domain
+package user_domain
 
 type UserFilter struct {
 	IDs    []uint64

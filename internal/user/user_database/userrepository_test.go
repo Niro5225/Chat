@@ -1,10 +1,10 @@
 package user_database
 
 import (
-	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/config"
 	"chat-app/internal/infrastructure/database"
 	"chat-app/internal/user"
+	"chat-app/internal/user/user_domain"
 	"fmt"
 	"log"
 	"testing"
@@ -74,7 +74,7 @@ func TestCreateUserCredential(t *testing.T) {
 
 	u, _ := r.CreateUser(*TestUser)
 
-	userCredential := chat_domain.NewUserCredential(u.ID, "testpassword", u.Email)
+	userCredential := user_domain.NewUserCredential(u.ID, "testpassword", u.Email)
 
 	userCredential1, err := r.CreateUserCredential(*userCredential)
 
@@ -88,7 +88,7 @@ func TestCreateUserCredential(t *testing.T) {
 func TestUpdateUserCredential(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
 
-	userCredential := chat_domain.NewUserCredential(u.ID, "testpassword", u.Email)
+	userCredential := user_domain.NewUserCredential(u.ID, "testpassword", u.Email)
 
 	userCredential, err = r.CreateUserCredential(*userCredential)
 
@@ -104,7 +104,7 @@ func TestUpdateUserCredential(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	newCred := chat_domain.NewUserCredential(newUser.ID, "testpassword", newUser.Email)
+	newCred := user_domain.NewUserCredential(newUser.ID, "testpassword", newUser.Email)
 	newCred, err = r.UpdateUserCredential(*newCred)
 
 	assert.NoError(t, err)
@@ -118,7 +118,7 @@ func TestGetUsersByIDs(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
 	u1, _ := r.CreateUser(*user.NewUser("second", "second", "second"))
 	u2, _ := r.CreateUser(*user.NewUser("third", "third", "third"))
-	filter := chat_domain.UserFilter{IDs: []uint64{u.ID, u1.ID, u2.ID}}
+	filter := user_domain.UserFilter{IDs: []uint64{u.ID, u1.ID, u2.ID}}
 	users, err := r.GetUsers(&filter)
 
 	assert.NoError(t, err)
@@ -130,7 +130,7 @@ func TestGetUsersByEmail(t *testing.T) {
 	truncTable("users")
 
 	u, _ := r.CreateUser(*TestUser)
-	filter := chat_domain.UserFilter{Email: &u.Email}
+	filter := user_domain.UserFilter{Email: &u.Email}
 	users, err := r.GetUsers(&filter)
 
 	assert.NoError(t, err)
@@ -141,7 +141,7 @@ func TestGetUsersByEmail(t *testing.T) {
 
 func TestGetUsersBySearch(t *testing.T) {
 	u, _ := r.CreateUser(*TestUser)
-	filter := chat_domain.UserFilter{Search: &u.FirstName}
+	filter := user_domain.UserFilter{Search: &u.FirstName}
 	users, err := r.GetUsers(&filter)
 
 	assert.NoError(t, err)

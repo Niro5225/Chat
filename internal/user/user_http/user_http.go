@@ -54,7 +54,7 @@ func (uh *UserHandlers) GetUserId(c *gin.Context) {
 }
 
 func (uh *UserHandlers) GetUsers(c *gin.Context) {
-	filter := chat_domain.UserFilter{}
+	filter := user_domain.UserFilter{}
 	query := c.Request.URL.Query()
 	if query["ids"] != nil {
 		Ids := strings.Split(query["ids"][0], ",")
@@ -161,7 +161,7 @@ func (uh *UserHandlers) Registration(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
-	uc, err := uh.UserService.CreateUserCredential(*chat_domain.NewUserCredential(user.ID, "testRegPassword", user.Email))
+	uc, err := uh.UserService.CreateUserCredential(*user_domain.NewUserCredential(user.ID, "testRegPassword", user.Email))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),

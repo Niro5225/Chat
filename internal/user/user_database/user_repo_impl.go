@@ -1,8 +1,8 @@
 package user_database
 
 import (
-	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/user"
+	"chat-app/internal/user/user_domain"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -49,7 +49,7 @@ func (r *UserRepoImpl) GetUser(id uint64) (*user.User, error) {
 	return &u, nil
 }
 
-func (r *UserRepoImpl) GetUsers(userFilter *chat_domain.UserFilter) ([]user.User, error) {
+func (r *UserRepoImpl) GetUsers(userFilter *user_domain.UserFilter) ([]user.User, error) {
 	users := []user.User{}
 	if userFilter != nil {
 		if len(userFilter.IDs) != 0 {
@@ -106,7 +106,7 @@ func (r *UserRepoImpl) UpdateUser(user user.User) (*user.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepoImpl) CreateUserCredential(credential chat_domain.UserCredential) (*chat_domain.UserCredential, error) {
+func (r *UserRepoImpl) CreateUserCredential(credential user_domain.UserCredential) (*user_domain.UserCredential, error) {
 	err := r.db.QueryRow("INSERT INTO user_credential (id,email,password) VALUES ($1, $2,$3) RETURNING id",
 		credential.ID, credential.Email, credential.Password).Scan(&credential.ID)
 
@@ -117,8 +117,8 @@ func (r *UserRepoImpl) CreateUserCredential(credential chat_domain.UserCredentia
 	return &credential, nil
 }
 
-func (r *UserRepoImpl) GetUserCredential(email string) (*chat_domain.UserCredential, error) {
-	var uc chat_domain.UserCredential
+func (r *UserRepoImpl) GetUserCredential(email string) (*user_domain.UserCredential, error) {
+	var uc user_domain.UserCredential
 	if err := r.db.QueryRow(
 		"SELECT id,email,password FROM user_credential WHERE email = $1", email,
 	).Scan(&uc.ID, &uc.Email, &uc.Password); err != nil {
@@ -128,7 +128,7 @@ func (r *UserRepoImpl) GetUserCredential(email string) (*chat_domain.UserCredent
 	return &uc, nil
 }
 
-func (r *UserRepoImpl) UpdateUserCredential(credential chat_domain.UserCredential) (*chat_domain.UserCredential, error) {
+func (r *UserRepoImpl) UpdateUserCredential(credential user_domain.UserCredential) (*user_domain.UserCredential, error) {
 	row := r.db.QueryRow("UPDATE user_credential SET email=$2,password=$3 WHERE id = $1",
 		credential.ID, credential.Email, credential.Password)
 

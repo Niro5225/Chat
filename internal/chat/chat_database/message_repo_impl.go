@@ -2,6 +2,7 @@ package chat_database
 
 import (
 	"chat-app/internal/chat/chat_domain"
+	"chat-app/internal/user/user_domain"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -114,7 +115,7 @@ func (r *MessageRepoImpl) DeleteMessage(id uint64) error {
 	return nil
 }
 
-func (r *MessageRepoImpl) CreateUserMessages(userMessages []chat_domain.UserMessage) error {
+func (r *MessageRepoImpl) CreateUserMessages(userMessages []user_domain.UserMessage) error {
 	for _, userMessage := range userMessages {
 		row := r.db.QueryRow(
 			"INSERT INTO user_message (user_id,message_id,is_read) VALUES ($1, $2,$3)",
@@ -127,7 +128,7 @@ func (r *MessageRepoImpl) CreateUserMessages(userMessages []chat_domain.UserMess
 	return nil
 }
 
-func (r *MessageRepoImpl) UpdateUserMessage(userMessage chat_domain.UserMessage) (*chat_domain.UserMessage, error) {
+func (r *MessageRepoImpl) UpdateUserMessage(userMessage user_domain.UserMessage) (*user_domain.UserMessage, error) {
 	row := r.db.QueryRow("UPDATE user_message SET user_id = $1, message_id = $2, is_read=$3 WHERE user_id = $1",
 		userMessage.UserID, userMessage.MessageID, userMessage.IsRead)
 	if row.Err() != nil {
@@ -136,7 +137,7 @@ func (r *MessageRepoImpl) UpdateUserMessage(userMessage chat_domain.UserMessage)
 	return &userMessage, nil
 }
 
-func (r *MessageRepoImpl) DeleteUserMessage(userMessage chat_domain.UserMessage) error {
+func (r *MessageRepoImpl) DeleteUserMessage(userMessage user_domain.UserMessage) error {
 	row := r.db.QueryRow("DELETE FROM user_message WHERE user_id=$1 AND message_id=$2", userMessage.UserID, userMessage.MessageID)
 	if row.Err() != nil {
 		return row.Err()

@@ -1,12 +1,15 @@
-package chat_domain
+package chat_database
 
-import "chat-app/internal/user/user_domain"
+import (
+	"chat-app/internal/chat/chat_domain"
+	"chat-app/internal/user/user_domain"
+)
 
 type MessageService interface {
-	GetMessage(id uint64) (*Message, error)
-	GetMessages(filter *MessageFilter) ([]Message, error)
-	CreateMessage(chat Message) (*Message, error)
-	UpdateMessage(chat Message) (*Message, error)
+	GetMessage(id uint64) (*chat_domain.Message, error)
+	GetMessages(filter *chat_domain.MessageFilter) ([]chat_domain.Message, error)
+	CreateMessage(chat chat_domain.Message) (*chat_domain.Message, error)
+	UpdateMessage(chat chat_domain.Message) (*chat_domain.Message, error)
 	DeleteMessage(id uint64) error
 
 	CreateUserMessages(userMessage []user_domain.UserMessage) error
@@ -22,19 +25,19 @@ func NewMessageServiceImp(repo MessageRepository) *MessageServiceImp {
 	return &MessageServiceImp{repo: repo}
 }
 
-func (s *MessageServiceImp) GetMessage(id uint64) (*Message, error) {
+func (s *MessageServiceImp) GetMessage(id uint64) (*chat_domain.Message, error) {
 	return s.repo.GetMessage(id)
 }
 
-func (s *MessageServiceImp) GetMessages(filter *MessageFilter) ([]Message, error) {
+func (s *MessageServiceImp) GetMessages(filter *chat_domain.MessageFilter) ([]chat_domain.Message, error) {
 	return s.repo.GetMessages(filter)
 }
 
-func (s *MessageServiceImp) CreateMessage(chat Message) (*Message, error) {
+func (s *MessageServiceImp) CreateMessage(chat chat_domain.Message) (*chat_domain.Message, error) {
 	return s.repo.CreateMessage(chat)
 }
 
-func (s *MessageServiceImp) UpdateMessage(chat Message) (*Message, error) {
+func (s *MessageServiceImp) UpdateMessage(chat chat_domain.Message) (*chat_domain.Message, error) {
 	return s.repo.UpdateMessage(chat)
 }
 
