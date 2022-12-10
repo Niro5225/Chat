@@ -8,9 +8,9 @@ import (
 )
 
 type UserCredential struct {
-	ID       uint64 // user.ID One to One
-	Email    string
-	Password string
+	ID       uint64 `db:"id"` // user.ID One to One
+	Email    string `db:"email"`
+	Password string `db:"password"`
 }
 
 func NewUserCredential(user_id uint64, password, email string) *UserCredential {

@@ -31,8 +31,8 @@ func (r *ChatRepoImpl) CreateChat(chat chat_domain.Chat) (*chat_domain.Chat, err
 func (r *ChatRepoImpl) GetChat(id uint64) (*chat_domain.Chat, error) {
 	var chat chat_domain.Chat
 	if err := r.db.QueryRow(
-		"SELECT chat_name,chat_description,created_by,created_at FROM chats WHERE id = $1", id,
-	).Scan(&chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
+		"SELECT id,chat_name,chat_description,created_by,created_at FROM chats WHERE id = $1", id,
+	).Scan(&chat.ID, &chat.Name, &chat.Description, &chat.CreatedBy, &chat.CreatedAt); err != nil {
 		return nil, err
 	}
 	return &chat, nil

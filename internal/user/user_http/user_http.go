@@ -125,6 +125,17 @@ func (uh *UserHandlers) GetMessages(c *gin.Context) {
 			}
 			filter.IDs = append(filter.UserIDs, uint64(uintId))
 		}
+	} else {
+		messages, err := uh.MessageService.GetMessages(nil)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+		}
+		for _, message := range messages {
+			fmt.Println(message)
+		}
+		return
 	}
 	messages, err := uh.MessageService.GetMessages(&filter)
 	if err != nil {
