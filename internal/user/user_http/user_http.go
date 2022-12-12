@@ -103,6 +103,7 @@ func (uh *UserHandlers) GetUsers(c *gin.Context) {
 	for _, user := range users {
 		userDtos = append(userDtos, toDto(&user))
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"users": userDtos,
 	})

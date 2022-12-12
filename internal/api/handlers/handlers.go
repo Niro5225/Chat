@@ -30,13 +30,13 @@ func NewRouter(userHandlers *userhttp.UserHandlers, chatHandlers *chathttp.ChatH
 func (r *Router) Configure_router() { //Настройка роутера
 	r.Router.GET("/ping", r.ping)
 	users := r.Router.Group("/users")
-	users.Use(r.userHandler.UserIdentity)
+	users.Use(r.userHandler.UserIdentity())
 	{
 		users.GET("/", r.userHandler.GetUsers)
 		users.GET("/:id", r.userHandler.GetUserId)
 	}
 	chats := r.Router.Group("/chats")
-	chats.Use(r.userHandler.UserIdentity)
+	chats.Use(r.userHandler.UserIdentity())
 	{
 		chats.GET("/", r.chatHandlers.GetChatsQuery)
 		chats.GET("/:id", r.chatHandlers.ChatsId)

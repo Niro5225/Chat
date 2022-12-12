@@ -4,6 +4,7 @@ import (
 	"chat-app/internal/user"
 	"errors"
 	"fmt"
+	"os"
 
 	"time"
 
@@ -23,13 +24,14 @@ type UserService interface {
 	DeleteUser(id uint64) error
 }
 
-const tokenKey = "ndkasd#nasjnda#kndkj"
+var tokenKey = os.Getenv("TOKENKEY")
 
 type UserServiceImp struct {
 	repo UserRepository
 }
 
 func NewUserServiceImp(repo UserRepository) *UserServiceImp {
+	fmt.Println(tokenKey)
 	return &UserServiceImp{repo: repo}
 }
 
