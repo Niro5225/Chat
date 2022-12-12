@@ -5,7 +5,6 @@ import (
 	chatdto "chat-app/internal/chat/chat_dto"
 	"chat-app/internal/user/user_domain"
 
-	"chat-app/internal/user"
 	"fmt"
 	"log"
 	"net/http"
@@ -119,7 +118,7 @@ func (ch *ChatHandlers) ChatsId(c *gin.Context) {
 func (ch *ChatHandlers) CreateChat(c *gin.Context) {
 	id, _ := c.Get("userId")
 	fmt.Println(id)
-	u, _ := ch.UserService.CreateUser(*user.NewUser("testFirstName", "TestLastName", "testHandlerEmail"))
+	u, _ := ch.UserService.CreateUser(*user_domain.NewUser("testFirstName", "TestLastName", "testHandlerEmail"))
 	chat := chat_domain.NewChat("testName", "testDescription", u.ID, time.Now())
 	chat, err := ch.ChatService.CreateChat(*chat)
 	if err != nil {

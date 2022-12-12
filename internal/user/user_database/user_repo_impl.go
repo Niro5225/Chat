@@ -1,7 +1,6 @@
 package user_database
 
 import (
-	"chat-app/internal/user"
 	"chat-app/internal/user/user_domain"
 	"time"
 
@@ -16,7 +15,7 @@ func NewUserRepoImpl(db *sqlx.DB) *UserRepoImpl {
 	return &UserRepoImpl{db: db}
 }
 
-func (r *UserRepoImpl) CreateUser(user user.User) (*user.User, error) {
+func (r *UserRepoImpl) CreateUser(user user_domain.User) (*user_domain.User, error) {
 	err := r.db.QueryRow(
 		"INSERT INTO users (first_name,last_name,email,created_at) VALUES ($1, $2,$3,$4) RETURNING id", user.FirstName, user.LastName, user.Email, user.CreatedAt,
 	).Scan(&user.ID)
@@ -36,8 +35,8 @@ func (r *UserRepoImpl) DeleteUser(id uint64) error {
 	return nil
 }
 
-func (r *UserRepoImpl) GetUser(id uint64) (*user.User, error) {
-	var u user.User
+func (r *UserRepoImpl) GetUser(id uint64) (*user_domain.User, error) {
+	var u user_domain.User
 	if err := r.db.QueryRow(
 		"SELECT first_name,last_name,email FROM users WHERE id = $1", id,
 	).Scan(&u.FirstName, &u.LastName, &u.Email); err != nil {
@@ -49,12 +48,12 @@ func (r *UserRepoImpl) GetUser(id uint64) (*user.User, error) {
 	return &u, nil
 }
 
-func (r *UserRepoImpl) GetUsers(userFilter *user_domain.UserFilter) ([]user.User, error) {
-	users := []user.User{}
+func (r *UserRepoImpl) GetUsers(userFilter *user_domain.UserFilter) ([]user_domain.User, error) {
+	users := []user_domain.User{}
 	if userFilter != nil {
 		if len(userFilter.IDs) != 0 {
 			for _, id := range userFilter.IDs {
-				var u user.User
+				var u user_domain.User
 				if err := r.db.QueryRow(
 					"SELECT id,first_name,last_name,email FROM users WHERE id = $1", id,
 				).Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email); err != nil {
@@ -63,7 +62,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *user_domain.UserFilter) ([]user.User
 				users = append(users, u)
 			}
 		} else if userFilter.Email != nil {
-			var u user.User
+			var u user_domain.User
 			if err := r.db.QueryRow(
 				"SELECT id,first_name,last_name,email FROM users WHERE email = $1", userFilter.Email,
 			).Scan(&u.ID, &u.FirstName, &u.LastName, &u.Email); err != nil {
@@ -77,7 +76,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *user_domain.UserFilter) ([]user.User
 				return nil, err
 			}
 			for rows.Next() {
-				var u user.User
+				var u user_domain.User
 				err = rows.StructScan(&u)
 				users = append(users, u)
 			}
@@ -89,7 +88,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *user_domain.UserFilter) ([]user.User
 			return nil, err
 		}
 		for rows.Next() {
-			var u user.User
+			var u user_domain.User
 			err = rows.StructScan(&u)
 			users = append(users, u)
 		}
@@ -97,7 +96,7 @@ func (r *UserRepoImpl) GetUsers(userFilter *user_domain.UserFilter) ([]user.User
 	return users, nil
 }
 
-func (r *UserRepoImpl) UpdateUser(user user.User) (*user.User, error) {
+func (r *UserRepoImpl) UpdateUser(user user_domain.User) (*user_domain.User, error) {
 	row := r.db.QueryRow("UPDATE users SET first_name = $2, last_name = $3, email=$4,updated_at=$5 WHERE id = $1",
 		user.ID, user.FirstName, user.LastName, user.Email, time.Now())
 	if row.Err() != nil {

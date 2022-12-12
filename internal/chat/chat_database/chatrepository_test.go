@@ -4,8 +4,8 @@ import (
 	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/config"
 	"chat-app/internal/infrastructure/database"
-	"chat-app/internal/user"
 	"chat-app/internal/user/user_database"
+	"chat-app/internal/user/user_domain"
 	"fmt"
 	"log"
 	"testing"
@@ -18,7 +18,7 @@ var (
 	cfg      = config.New_config()
 	db, err  = database.NewDB(*cfg)
 	r        = user_database.NewUserRepoImpl(db)
-	TestUser = user.NewUser("test1", "test1", "testemail4")
+	TestUser = user_domain.NewUser("test1", "test1", "testemail4")
 	chatR    = NewChatRepoImpl(db)
 )
 

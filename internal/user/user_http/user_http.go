@@ -2,7 +2,6 @@ package userhttp
 
 import (
 	"chat-app/internal/chat/chat_domain"
-	"chat-app/internal/user"
 	"chat-app/internal/user/user_domain"
 	userdto "chat-app/internal/user/user_dto"
 
@@ -15,11 +14,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func fromDto(userDto *userdto.UserDTO) user.User {
-	return user.User{ID: userDto.Id, FirstName: userDto.FirstName, LastName: userDto.LastName, Email: userDto.Email}
+func fromDto(userDto *userdto.UserDTO) user_domain.User {
+	return user_domain.User{ID: userDto.Id, FirstName: userDto.FirstName, LastName: userDto.LastName, Email: userDto.Email}
 }
 
-func toDto(user *user.User) userdto.UserDTO {
+func toDto(user *user_domain.User) userdto.UserDTO {
 	return userdto.UserDTO{Id: user.ID, FirstName: user.FirstName, LastName: user.LastName, Email: user.Email}
 }
 
@@ -196,7 +195,7 @@ func (uh *UserHandlers) Login(c *gin.Context) {
 }
 
 func (uh *UserHandlers) Registration(c *gin.Context) {
-	var input user.User
+	var input user_domain.User
 
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -205,7 +204,7 @@ func (uh *UserHandlers) Registration(c *gin.Context) {
 		return
 	}
 
-	user, err := uh.UserService.CreateUser(*user.NewUser(input.FirstName, input.LastName, input.Email))
+	user, err := uh.UserService.CreateUser(*user_domain.NewUser(input.FirstName, input.LastName, input.Email))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
