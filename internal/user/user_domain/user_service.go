@@ -2,6 +2,8 @@ package user_domain
 
 import (
 	"chat-app/internal/user"
+	"errors"
+	"fmt"
 
 	"time"
 
@@ -56,17 +58,37 @@ func (s *UserServiceImp) GetUsers(userFilter *UserFilter) ([]user.User, error) {
 
 type NewTokenClaims struct {
 	jwt.StandardClaims
-	UserId uint64
+	UserId uint64 `json:"userId"`
 }
 
 func GenerateToken(userId uint64) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, NewTokenClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &NewTokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
 			IssuedAt:  time.Now().Unix()},
 		userId})
 
 	return token.SignedString([]byte(tokenKey))
+}
+
+func ParsToken(asscesstoken string) (uint64, error) {
+	token, err := jwt.ParseWithClaims(asscesstoken, &NewTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, done := token.Method.(*jwt.SigningMethodHMAC); !done {
+			return 0, errors.New("invalid token")
+		}
+		return []byte(tokenKey), nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(*NewTokenClaims)
+	if !ok {
+		return 0, errors.New("invalid token claims")
+	}
+	fmt.Println(claims)
+
+	return claims.UserId, nil
 }
 
 func (s *UserServiceImp) SignIn(email, password string) (*user.User, string, error) {

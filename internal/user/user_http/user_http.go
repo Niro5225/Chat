@@ -40,16 +40,20 @@ func (uh *UserHandlers) GetUserId(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	u, err := uh.UserService.GetUser(uint64(uintId))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 
+	userDto := toDto(u)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": u,
+		"message": userDto,
 	})
 }
 
@@ -76,9 +80,14 @@ func (uh *UserHandlers) GetUsers(c *gin.Context) {
 				"message": err.Error(),
 			})
 		}
+		userDtos := []userdto.UserDTO{}
+
 		for _, user := range users {
-			fmt.Println(user)
+			userDtos = append(userDtos, toDto(&user))
 		}
+		c.JSON(http.StatusOK, gin.H{
+			"users": userDtos,
+		})
 		return
 	}
 
@@ -88,9 +97,16 @@ func (uh *UserHandlers) GetUsers(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+
+	userDtos := []userdto.UserDTO{}
+
 	for _, user := range users {
-		fmt.Println(user)
+		userDtos = append(userDtos, toDto(&user))
 	}
+	c.JSON(http.StatusOK, gin.H{
+		"users": userDtos,
+	})
+
 }
 
 func (uh *UserHandlers) GetMessages(c *gin.Context) {
@@ -149,44 +165,72 @@ func (uh *UserHandlers) GetMessages(c *gin.Context) {
 }
 
 func (uh *UserHandlers) Login(c *gin.Context) {
-	email := "testLoginEmail"
-	password := "testLoginPassword"
+	inputData := struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}{}
 
-	user, token, err := uh.UserService.SignIn(email, password)
+	if err := c.BindJSON(&inputData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	user, token, err := uh.UserService.SignIn(inputData.Email, inputData.Password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
+
+	userDto := toDto(user)
+
 	c.JSON(http.StatusOK, gin.H{
-		"user":  user,
+		"user":  userDto,
 		"token": token,
 	})
 
 }
 
 func (uh *UserHandlers) Registration(c *gin.Context) {
-	user, err := uh.UserService.CreateUser(*user.NewUser("testRegName", "testRegName", "testRegEmail"))
+	var input user.User
+
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	user, err := uh.UserService.CreateUser(*user.NewUser(input.FirstName, input.LastName, input.Email))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
+
+	userDto := toDto(user)
+
 	uc, err := uh.UserService.CreateUserCredential(*user_domain.NewUserCredential(user.ID, "testRegPassword", user.Email))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 	user, token, err := uh.UserService.SignUp(*user, *uc)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"user":  user,
+		"user":  userDto,
 		"token": token,
 	})
 

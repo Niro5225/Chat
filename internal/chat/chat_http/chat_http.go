@@ -65,9 +65,15 @@ func (ch *ChatHandlers) GetChatsQuery(c *gin.Context) {
 				"message": err.Error(),
 			})
 		}
+		chatDtos := []chatdto.ChatDTO{}
+
 		for _, chat := range chats {
-			fmt.Println(chat)
+			chatDtos = append(chatDtos, toDto(&chat))
 		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"chats": chatDtos,
+		})
 		return
 	}
 
@@ -77,9 +83,16 @@ func (ch *ChatHandlers) GetChatsQuery(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+
+	chatDtos := []chatdto.ChatDTO{}
+
 	for _, chat := range chats {
-		fmt.Println(chat)
+		chatDtos = append(chatDtos, toDto(&chat))
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"chats": chatDtos,
+	})
 
 }
 
@@ -96,12 +109,16 @@ func (ch *ChatHandlers) ChatsId(c *gin.Context) {
 		})
 	}
 
+	chatDto := toDto(chat)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": chat,
+		"message": chatDto,
 	})
 }
 
 func (ch *ChatHandlers) CreateChat(c *gin.Context) {
+	id, _ := c.Get("userId")
+	fmt.Println(id)
 	u, _ := ch.UserService.CreateUser(*user.NewUser("testFirstName", "TestLastName", "testHandlerEmail"))
 	chat := chat_domain.NewChat("testName", "testDescription", u.ID, time.Now())
 	chat, err := ch.ChatService.CreateChat(*chat)
@@ -110,8 +127,11 @@ func (ch *ChatHandlers) CreateChat(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+
+	chatDto := toDto(chat)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": chat,
+		"message": chatDto,
 	})
 }
 
@@ -136,8 +156,11 @@ func (ch *ChatHandlers) UpdateChat(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+
+	chatDto := toDto(chat)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": chat,
+		"message": chatDto,
 	})
 }
 
