@@ -1,0 +1,12 @@
+SERVERHOST=
+SERVERPORT= port
+DBHOST=localhost
+DBPORT=port
+DBUSER=user
+PASSWORD=password
+DBNAME=dbname
+SSLMODE=sslmode
+
+LOGLEVEL=loglevl
+
+TOKENKEY=tokenkey
