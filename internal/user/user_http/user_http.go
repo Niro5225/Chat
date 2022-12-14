@@ -1,6 +1,7 @@
 package userhttp
 
 import (
+	"chat-app/internal/api/handlers/handler_error"
 	"chat-app/internal/chat/chat_domain"
 	"chat-app/internal/user/user_domain"
 	userdto "chat-app/internal/user/user_dto"
@@ -14,14 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserErrorResponse struct {
-	Message string `json:"message"`
-}
-
-func NewError(c *gin.Context, statusCode int, message string) {
-	c.AbortWithStatusJSON(statusCode, UserErrorResponse{message})
-}
-
 func fromDto(userDto *userdto.UserDTO) user_domain.User {
 	return user_domain.User{ID: userDto.Id, FirstName: userDto.FirstName, LastName: userDto.LastName, Email: userDto.Email}
 }
@@ -34,10 +27,11 @@ type UserHandlers struct {
 	UserService    *user_domain.UserServiceImp
 	ChatService    *chat_domain.ChatServiceImp
 	MessageService *chat_domain.MessageServiceImp
+	httpError      *handler_error.HttpError
 }
 
-func NewUserHandlers(userService *user_domain.UserServiceImp, chatService *chat_domain.ChatServiceImp, messageService *chat_domain.MessageServiceImp) *UserHandlers {
-	return &UserHandlers{UserService: userService, ChatService: chatService, MessageService: messageService}
+func NewUserHandlers(userService *user_domain.UserServiceImp, chatService *chat_domain.ChatServiceImp, messageService *chat_domain.MessageServiceImp, HttpError *handler_error.HttpError) *UserHandlers {
+	return &UserHandlers{UserService: userService, ChatService: chatService, MessageService: messageService, httpError: HttpError}
 }
 
 func (uh *UserHandlers) GetUserId(c *gin.Context) {
@@ -49,7 +43,7 @@ func (uh *UserHandlers) GetUserId(c *gin.Context) {
 	}
 	u, err := uh.UserService.GetUser(uint64(uintId))
 	if err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 
 		return
 	}
@@ -80,7 +74,7 @@ func (uh *UserHandlers) GetUsers(c *gin.Context) {
 	} else {
 		users, err := uh.UserService.GetUsers(nil)
 		if err != nil {
-			NewError(c, http.StatusBadRequest, err.Error())
+			uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 		}
 		userDtos := []userdto.UserDTO{}
 
@@ -95,7 +89,7 @@ func (uh *UserHandlers) GetUsers(c *gin.Context) {
 
 	users, err := uh.UserService.GetUsers(&filter)
 	if err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 
 	}
 
@@ -146,7 +140,7 @@ func (uh *UserHandlers) GetMessages(c *gin.Context) {
 	} else {
 		messages, err := uh.MessageService.GetMessages(nil)
 		if err != nil {
-			NewError(c, http.StatusBadRequest, err.Error())
+			uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 
 		}
 		for _, message := range messages {
@@ -156,7 +150,7 @@ func (uh *UserHandlers) GetMessages(c *gin.Context) {
 	}
 	messages, err := uh.MessageService.GetMessages(&filter)
 	if err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 
 	}
 	for _, message := range messages {
@@ -171,14 +165,14 @@ func (uh *UserHandlers) Login(c *gin.Context) {
 	}{}
 
 	if err := c.BindJSON(&inputData); err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 
 		return
 	}
 
 	user, token, err := uh.UserService.SignIn(inputData.Email, inputData.Password)
 	if err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -195,13 +189,13 @@ func (uh *UserHandlers) Registration(c *gin.Context) {
 	var input user_domain.User
 
 	if err := c.BindJSON(&input); err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	user, err := uh.UserService.CreateUser(*user_domain.NewUser(input.FirstName, input.LastName, input.Email))
 	if err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -209,12 +203,12 @@ func (uh *UserHandlers) Registration(c *gin.Context) {
 
 	uc, err := uh.UserService.CreateUserCredential(*user_domain.NewUserCredential(user.ID, "testRegPassword", user.Email))
 	if err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	user, token, err := uh.UserService.SignUp(*user, *uc)
 	if err != nil {
-		NewError(c, http.StatusBadRequest, err.Error())
+		uh.httpError.NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 

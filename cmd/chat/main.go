@@ -2,6 +2,7 @@ package main
 
 import (
 	"chat-app/internal/api/handlers"
+	"chat-app/internal/api/handlers/handler_error"
 	"chat-app/internal/api/server"
 	"chat-app/internal/chat/chat_database"
 	"chat-app/internal/chat/chat_domain"
@@ -23,7 +24,7 @@ func main() {
 		logrus.Fatal(err)
 	}
 
-	// HttpError:=handlers.NewHttpError()
+	HttpError := handler_error.NewHttpError()
 
 	// repos := chat_domain.NewRepository(db) //обьект репозитория
 	// // services := chat_domain.NewServices(repos) //обьект сервиса
@@ -35,8 +36,8 @@ func main() {
 	CharService := chat_domain.NewChatServiceImp(ChatRepository)
 	MessageService := chat_domain.NewMessageServiceImp(MessageRepository)
 
-	userHandlers := userhttp.NewUserHandlers(UserService, CharService, MessageService)
-	catHandlers := chathttp.NewChatHandler(UserService, CharService, MessageService)
+	userHandlers := userhttp.NewUserHandlers(UserService, CharService, MessageService, HttpError)
+	catHandlers := chathttp.NewChatHandler(UserService, CharService, MessageService, HttpError)
 
 	router := handlers.NewRouter(userHandlers, catHandlers) //обьект роутера
 	serv := server.NewApiServer(cfg, logrus.New(), router)  //обьект сервера
