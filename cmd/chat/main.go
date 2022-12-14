@@ -23,6 +23,8 @@ func main() {
 		logrus.Fatal(err)
 	}
 
+	// HttpError:=handlers.NewHttpError()
+
 	// repos := chat_domain.NewRepository(db) //обьект репозитория
 	// // services := chat_domain.NewServices(repos) //обьект сервиса
 	UserRepository := user_database.NewUserRepoImpl(db)

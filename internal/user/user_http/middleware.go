@@ -14,33 +14,25 @@ func (uh *UserHandlers) UserIdentity() gin.HandlerFunc {
 
 		header := c.GetHeader("Authorization")
 		if header == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "Empty header",
-			})
+			NewError(c, http.StatusUnauthorized, "Empty header")
 			return
 		}
 
 		headerParts := strings.Split(header, " ")
 		if len(headerParts) != 2 {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "Invalid handler",
-			})
+			NewError(c, http.StatusUnauthorized, "Invalid handler")
 			return
 		}
 
 		userId, err := user_domain.ParsToken(headerParts[1])
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": err.Error(),
-			})
+			NewError(c, http.StatusUnauthorized, err.Error())
 			return
 		}
 
 		uses, err := uh.UserService.GetUser(userId)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": err.Error(),
-			})
+			NewError(c, http.StatusUnauthorized, err.Error())
 			return
 		}
 

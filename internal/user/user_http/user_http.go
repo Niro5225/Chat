@@ -14,6 +14,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserErrorResponse struct {
+	Message string `json:"message"`
+}
+
+func NewError(c *gin.Context, statusCode int, message string) {
+	c.AbortWithStatusJSON(statusCode, UserErrorResponse{message})
+}
+
 func fromDto(userDto *userdto.UserDTO) user_domain.User {
 	return user_domain.User{ID: userDto.Id, FirstName: userDto.FirstName, LastName: userDto.LastName, Email: userDto.Email}
 }
@@ -36,16 +44,13 @@ func (uh *UserHandlers) GetUserId(c *gin.Context) {
 	id := c.Param("id")
 	uintId, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		log.Fatal(err)
 		return
 	}
 	u, err := uh.UserService.GetUser(uint64(uintId))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
@@ -75,9 +80,7 @@ func (uh *UserHandlers) GetUsers(c *gin.Context) {
 	} else {
 		users, err := uh.UserService.GetUsers(nil)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": err.Error(),
-			})
+			NewError(c, http.StatusBadRequest, err.Error())
 		}
 		userDtos := []userdto.UserDTO{}
 
@@ -92,9 +95,8 @@ func (uh *UserHandlers) GetUsers(c *gin.Context) {
 
 	users, err := uh.UserService.GetUsers(&filter)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
+
 	}
 
 	userDtos := []userdto.UserDTO{}
@@ -144,9 +146,8 @@ func (uh *UserHandlers) GetMessages(c *gin.Context) {
 	} else {
 		messages, err := uh.MessageService.GetMessages(nil)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": err.Error(),
-			})
+			NewError(c, http.StatusBadRequest, err.Error())
+
 		}
 		for _, message := range messages {
 			fmt.Println(message)
@@ -155,9 +156,8 @@ func (uh *UserHandlers) GetMessages(c *gin.Context) {
 	}
 	messages, err := uh.MessageService.GetMessages(&filter)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
+
 	}
 	for _, message := range messages {
 		fmt.Println(message)
@@ -171,17 +171,14 @@ func (uh *UserHandlers) Login(c *gin.Context) {
 	}{}
 
 	if err := c.BindJSON(&inputData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
+
 		return
 	}
 
 	user, token, err := uh.UserService.SignIn(inputData.Email, inputData.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -198,17 +195,13 @@ func (uh *UserHandlers) Registration(c *gin.Context) {
 	var input user_domain.User
 
 	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	user, err := uh.UserService.CreateUser(*user_domain.NewUser(input.FirstName, input.LastName, input.Email))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -216,16 +209,12 @@ func (uh *UserHandlers) Registration(c *gin.Context) {
 
 	uc, err := uh.UserService.CreateUserCredential(*user_domain.NewUserCredential(user.ID, "testRegPassword", user.Email))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	user, token, err := uh.UserService.SignUp(*user, *uc)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 

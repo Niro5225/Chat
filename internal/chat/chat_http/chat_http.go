@@ -15,6 +15,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type ChatErrorResponse struct {
+	Message string `json:"message"`
+}
+
+func NewError(c *gin.Context, statusCode int, message string) {
+	c.AbortWithStatusJSON(statusCode, ChatErrorResponse{message})
+}
+
 func fromDto(chatDto *chatdto.ChatDTO) chat_domain.Chat {
 	return chat_domain.Chat{ID: chatDto.Id, Name: chatDto.Name, Description: chatDto.Description}
 }
@@ -60,9 +68,7 @@ func (ch *ChatHandlers) GetChatsQuery(c *gin.Context) {
 	} else {
 		chats, err := ch.ChatService.GetChats(nil)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": err.Error(),
-			})
+			NewError(c, http.StatusBadRequest, err.Error())
 		}
 		chatDtos := []chatdto.ChatDTO{}
 
@@ -78,9 +84,7 @@ func (ch *ChatHandlers) GetChatsQuery(c *gin.Context) {
 
 	chats, err := ch.ChatService.GetChats(&filter)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 	}
 
 	chatDtos := []chatdto.ChatDTO{}
@@ -103,9 +107,7 @@ func (ch *ChatHandlers) ChatsId(c *gin.Context) {
 	}
 	chat, err := ch.ChatService.GetChat(uint64(uintId))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 	}
 
 	chatDto := toDto(chat)
@@ -122,9 +124,7 @@ func (ch *ChatHandlers) CreateChat(c *gin.Context) {
 	chat := chat_domain.NewChat("testName", "testDescription", u.ID, time.Now())
 	chat, err := ch.ChatService.CreateChat(*chat)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 	}
 
 	chatDto := toDto(chat)
@@ -142,18 +142,14 @@ func (ch *ChatHandlers) UpdateChat(c *gin.Context) {
 	}
 	chat, err := ch.ChatService.GetChat(uint64(uintId))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 	}
 
 	chat.Name = "ChangedName"
 
 	chat, err = ch.ChatService.UpdateChat(*chat)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 	}
 
 	chatDto := toDto(chat)
@@ -171,9 +167,7 @@ func (ch *ChatHandlers) DeleteChat(c *gin.Context) {
 	}
 	err = ch.ChatService.DeleteChat(uint64(uintId))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
+		NewError(c, http.StatusBadRequest, err.Error())
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "OK",
