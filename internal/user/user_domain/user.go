@@ -20,24 +20,6 @@ func NewUser(FirstName, LastName, Email string) *User {
 	return &User{FirstName: FirstName, LastName: LastName, Email: Email, CreatedAt: createTime}
 }
 
-// func (u *User) Before_create() error {
-// 	if len(u.Uncrypted_Password) > 0 {
-// 		enc := encryption_password(u.Uncrypted_Password)
-// 		u.Encrypted_Password = enc
-// 	}
-
-// 	return nil
-// }
-
-// func encryption_password(password string) (string, error) {
-// 	e, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	return string(e), nil
-// }
-
 func (u *User) ValidateUser() error {
 	return validation.ValidateStruct(
 		u,

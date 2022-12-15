@@ -19,15 +19,13 @@ import (
 func main() {
 	cfg := config.New_config() //обьект конфига
 
-	db, err := database.NewDB(*cfg) //обьекconfig
+	db, err := database.NewDB(*cfg) //обьект бд
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	HttpError := handler_error.NewHttpError()
 
-	// repos := chat_domain.NewRepository(db) //обьект репозитория
-	// // services := chat_domain.NewServices(repos) //обьект сервиса
 	UserRepository := user_database.NewUserRepoImpl(db)
 	ChatRepository := chat_database.NewChatRepoImpl(db)
 	MessageRepository := chat_database.NewMessageRepoImpl(db)
