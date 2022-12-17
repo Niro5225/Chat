@@ -2,6 +2,7 @@ package handlers
 
 import (
 	chathttp "chat-app/internal/chat/chat_http"
+	"chat-app/internal/connector/connector_http"
 	userhttp "chat-app/internal/user/user_http"
 	"html/template"
 	"log"
@@ -11,20 +12,21 @@ import (
 )
 
 type Router struct {
-	Router       *gin.Engine
-	userHandler  *userhttp.UserHandlers
-	chatHandlers *chathttp.ChatHandlers
-	tpl          *template.Template
+	Router            *gin.Engine
+	userHandler       *userhttp.UserHandlers
+	chatHandlers      *chathttp.ChatHandlers
+	connectorHandlers *connector_http.ConnectorHandlers
+	tpl               *template.Template
 }
 
-func NewRouter(userHandlers *userhttp.UserHandlers, chatHandlers *chathttp.ChatHandlers) *Router { //Создание роутера
+func NewRouter(userHandlers *userhttp.UserHandlers, chatHandlers *chathttp.ChatHandlers, connectorHandlers *connector_http.ConnectorHandlers) *Router { //Создание роутера
 	var tpl *template.Template
 
 	tpl, err := template.ParseGlob("internal\\web\\*.gohtml") //получение всех gohtml файлов
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return &Router{Router: gin.New(), tpl: tpl, chatHandlers: chatHandlers, userHandler: userHandlers}
+	return &Router{Router: gin.New(), tpl: tpl, chatHandlers: chatHandlers, userHandler: userHandlers, connectorHandlers: connectorHandlers}
 }
 
 func (r *Router) Configure_router() { //Настройка роутера
@@ -44,7 +46,9 @@ func (r *Router) Configure_router() { //Настройка роутера
 		chats.PUT("/", r.chatHandlers.UpdateChat)
 		chats.DELETE("/:id", r.chatHandlers.DeleteChat)
 		chats.GET("/messages", r.userHandler.GetMessages)
+		chats.POST("/add_to_room", r.connectorHandlers.AddToRoom)
 	}
+
 	auth := r.Router.Group("/auth")
 	{
 		auth.POST("/signin", r.userHandler.Login)
