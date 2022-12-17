@@ -46,7 +46,7 @@ func (r *Router) Configure_router() { //Настройка роутера
 		chats.PUT("/", r.chatHandlers.UpdateChat)
 		chats.DELETE("/:id", r.chatHandlers.DeleteChat)
 		chats.GET("/messages", r.userHandler.GetMessages)
-		chats.POST("/add_to_room", r.connectorHandlers.AddToRoom)
+		chats.POST("/add_to_chat", r.connectorHandlers.AddToRoom)
 	}
 
 	auth := r.Router.Group("/auth")
