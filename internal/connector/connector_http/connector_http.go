@@ -67,10 +67,16 @@ func (ch *ConnectorHandlers) AddToRoom(c *gin.Context) {
 		ch.httpError.NewError(c, http.StatusBadRequest, err.Error())
 	}
 
-	con := connection_domain.NewConnectionImpl(ws, *user, &inputData.ChatId)
+	connection := connection_domain.NewConnectionImpl(ws, *user, &inputData.ChatId)
+
+	// connector := connector_domain.NewConnectorImpl()
+
+	// if err := connector.AddConnection(connection); err != nil {
+	// 	ch.httpError.NewError(c, http.StatusBadRequest, err.Error())
+	// }
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-		"con":     con,
+		"message":    "OK",
+		"connection": connection,
 	})
 }
