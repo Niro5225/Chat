@@ -31,6 +31,7 @@ func NewRouter(userHandlers *userhttp.UserHandlers, chatHandlers *chathttp.ChatH
 
 func (r *Router) Configure_router() { //Настройка роутера
 	r.Router.GET("/ping", r.ping)
+	r.Router.GET("/test", r.connectorHandlers.AddToRoom)
 	users := r.Router.Group("/users")
 	users.Use(r.userHandler.UserIdentity())
 	{
@@ -46,7 +47,11 @@ func (r *Router) Configure_router() { //Настройка роутера
 		chats.PUT("/", r.chatHandlers.UpdateChat)
 		chats.DELETE("/:id", r.chatHandlers.DeleteChat)
 		chats.GET("/messages", r.userHandler.GetMessages)
-		chats.POST("/add_to_chat", r.connectorHandlers.AddToRoom)
+	}
+
+	ws := r.Router.Group("/ws")
+	{
+		ws.GET("/add_to_chat", r.connectorHandlers.AddToRoom)
 	}
 
 	auth := r.Router.Group("/auth")

@@ -14,7 +14,10 @@ type ConnectorImpl struct {
 }
 
 func NewConnectorImpl() *ConnectorImpl {
-	return &ConnectorImpl{}
+	return &ConnectorImpl{
+		Rooms:       make(map[uint64][]connection_domain.Connection),
+		Connections: make(map[uint64][]connection_domain.Connection),
+	}
 }
 
 func (c *ConnectorImpl) AddConnection(conn connection_domain.Connection) error {
@@ -27,9 +30,9 @@ func (c *ConnectorImpl) SendMessageByRoom(roomID uint64, msg interface{}) {
 
 func (c *ConnectorImpl) GetUserConnection(userID uint64) *connection_domain.Connection {
 
-	for id, _ := range c.Connections {
+	for id, con := range c.Connections {
 		if userID == id {
-			return &c.Connections[id][0]
+			return &con[0]
 		}
 	}
 	return nil

@@ -12,12 +12,12 @@ type Connection interface {
 
 type ConnectionImpl struct {
 	wsConn        *websocket.Conn
-	userID        user_domain.User
-	currentChatID *uint64
+	UserID        user_domain.User
+	CurrentChatID *uint64
 }
 
 func NewConnectionImpl(wsConn *websocket.Conn, userID user_domain.User, currentChatID *uint64) *ConnectionImpl {
-	return &ConnectionImpl{wsConn: wsConn, userID: userID, currentChatID: currentChatID}
+	return &ConnectionImpl{wsConn: wsConn, UserID: userID, CurrentChatID: currentChatID}
 }
 
 func (c *ConnectionImpl) SendMessage(data interface{}) error {
