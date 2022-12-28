@@ -2,6 +2,7 @@ package handlers
 
 import (
 	chathttp "chat-app/internal/chat/chat_http"
+	"chat-app/internal/connector/connector_domain"
 	"chat-app/internal/connector/connector_http"
 	userhttp "chat-app/internal/user/user_http"
 	"html/template"
@@ -16,22 +17,26 @@ type Router struct {
 	userHandler       *userhttp.UserHandlers
 	chatHandlers      *chathttp.ChatHandlers
 	connectorHandlers *connector_http.ConnectorHandlers
+	connector         *connector_domain.ConnectorImpl
 	tpl               *template.Template
 }
 
-func NewRouter(userHandlers *userhttp.UserHandlers, chatHandlers *chathttp.ChatHandlers, connectorHandlers *connector_http.ConnectorHandlers) *Router { //Создание роутера
+func NewRouter(userHandlers *userhttp.UserHandlers,
+	chatHandlers *chathttp.ChatHandlers,
+	connectorHandlers *connector_http.ConnectorHandlers,
+	connector *connector_domain.ConnectorImpl) *Router { //Создание роутера
 	var tpl *template.Template
 
 	tpl, err := template.ParseGlob("internal\\web\\*.gohtml") //получение всех gohtml файлов
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return &Router{Router: gin.New(), tpl: tpl, chatHandlers: chatHandlers, userHandler: userHandlers, connectorHandlers: connectorHandlers}
+	return &Router{Router: gin.New(), tpl: tpl, chatHandlers: chatHandlers, userHandler: userHandlers, connectorHandlers: connectorHandlers, connector: connector}
 }
 
 func (r *Router) Configure_router() { //Настройка роутера
 	r.Router.GET("/ping", r.ping)
-	r.Router.GET("/test", r.connectorHandlers.AddToRoom)
+	// r.Router.GET("/test", r.connectorHandlers.AddToRoom(r.connector))
 	users := r.Router.Group("/users")
 	users.Use(r.userHandler.UserIdentity())
 	{
@@ -51,7 +56,7 @@ func (r *Router) Configure_router() { //Настройка роутера
 
 	ws := r.Router.Group("/ws")
 	{
-		ws.GET("/add_to_chat", r.connectorHandlers.AddToRoom)
+		ws.GET("/add_to_chat", r.connectorHandlers.AddToRoom(r.connector))
 	}
 
 	auth := r.Router.Group("/auth")

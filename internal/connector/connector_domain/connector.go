@@ -3,7 +3,7 @@ package connector_domain
 import "chat-app/internal/connection/connection_domain"
 
 type Connector interface {
-	AddConnection(conn connection_domain.Connection) error
+	AddConnection(UserId uint64, ChatId uint64, conn connection_domain.Connection)
 	SendMessageByRoom(roomID uint64, msg interface{})
 	GetUserConnection(userID uint64) *connection_domain.Connection
 }
@@ -20,8 +20,10 @@ func NewConnectorImpl() *ConnectorImpl {
 	}
 }
 
-func (c *ConnectorImpl) AddConnection(conn connection_domain.Connection) error {
-	return nil
+func (c *ConnectorImpl) AddConnection(UserId uint64, ChatId uint64, conn connection_domain.Connection) {
+	// id := len(c.Rooms) + 1
+	c.Rooms[ChatId] = []connection_domain.Connection{conn}
+	c.Connections[UserId] = []connection_domain.Connection{conn}
 }
 
 func (c *ConnectorImpl) SendMessageByRoom(roomID uint64, msg interface{}) {

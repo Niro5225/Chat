@@ -21,9 +21,9 @@ func TestCreateMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, message)
 
-	// truncTable("users")
-	// truncTable("chats")
-	// truncTable("messages")
+	truncTable("users")
+	truncTable("chats")
+	truncTable("messages")
 }
 
 func TestGetMessage(t *testing.T) {

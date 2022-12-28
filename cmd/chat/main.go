@@ -35,14 +35,15 @@ func main() {
 	UserService := user_domain.NewUserServiceImp(UserRepository)
 	CharService := chat_domain.NewChatServiceImp(ChatRepository)
 	MessageService := chat_domain.NewMessageServiceImp(MessageRepository)
-	ConnectorService := connector_domain.NewConnectorImpl()
+
+	Connector := connector_domain.NewConnectorImpl()
 
 	userHandlers := userhttp.NewUserHandlers(UserService, CharService, MessageService, HttpError)
 	catHandlers := chathttp.NewChatHandler(UserService, CharService, MessageService, HttpError)
-	connectorHandlers := connector_http.NewChatHandler(UserService, CharService, MessageService, ConnectorService, HttpError)
+	connectorHandlers := connector_http.NewChatHandler(UserService, CharService, MessageService, Connector, HttpError)
 
-	router := handlers.NewRouter(userHandlers, catHandlers, connectorHandlers) //обьект роутера
-	serv := server.NewApiServer(cfg, logrus.New(), router)                     //обьект сервера
+	router := handlers.NewRouter(userHandlers, catHandlers, connectorHandlers, Connector)
+	serv := server.NewApiServer(cfg, logrus.New(), router)
 
 	if err := serv.Start(); err != nil { //запуск сервера
 		logrus.Fatal(err.Error())
